@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { Viaje } from '../../interfaces/models/viaje.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClienteService {
-  private apiUrl = 'http://localhost:5001/api/cliente';
+  private apiUrl = 'http://localhost:5001/api/viajes';
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -18,8 +19,8 @@ export class ClienteService {
     });
   }
 
-  getMisViajes(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/mis_viajes`, { headers: this.getHeaders() });
+  getMisViajes(): Observable<Viaje[]> {
+    return this.http.get<Viaje[]>(`${this.apiUrl}/mis-viajes`, { headers: this.getHeaders() });
   }
 
   cancelarViaje(id: number): Observable<any> {
