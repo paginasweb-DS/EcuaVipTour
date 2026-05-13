@@ -1,0 +1,214 @@
+<div class="max-w-4xl mx-auto px-4 pt-8">
+  <div class="flex justify-between items-end mb-8">
+    <div>
+      <h1 class="text-3xl font-black text-ecuavip-dark tracking-tight">Mis Viajes</h1>
+      <p class="text-gray-500 font-medium mt-1">Gestiona tus reservas y solicita asistencia.</p>
+    </div>
+    <div class="flex bg-white p-1 rounded-2xl shadow-sm border border-gray-100 hidden md:flex">
+      <button (click)="filtro = 'todos'" [ngClass]="{'bg-ecuavip-blue text-white': filtro === 'todos'}" class="px-6 py-2 rounded-xl text-sm font-bold transition-all">Todos</button>
+      <button (click)="filtro = 'pendientes'" [ngClass]="{'bg-ecuavip-blue text-white': filtro === 'pendientes'}" class="px-6 py-2 rounded-xl text-sm font-bold transition-all">Activos</button>
+      <button (click)="filtro = 'finalizados'" [ngClass]="{'bg-ecuavip-blue text-white': filtro === 'finalizados'}" class="px-6 py-2 rounded-xl text-sm font-bold transition-all">Historial</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
+    <div class="animate-spin h-10 w-10 border-4 border-ecuavip-blue border-t-transparent rounded-full mb-4"></div>
+    <p class="text-gray-400 font-bold animate-pulse uppercase tracking-widest text-xs">Cargando bitácora...</p>
+  </div>
+
+  <div *ngIf="!loading && getViajesFiltrados().length === 0" class="bg-white rounded-[2.5rem] p-12 text-center shadow-sm border border-gray-100">
+    <div class="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-gray-300">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    </div>
+    <h3 class="text-xl font-black text-gray-900">Sin movimientos</h3>
+    <p class="text-gray-500 mt-2 mb-8 max-w-xs mx-auto">No tienes viajes registrados en esta categoría. ¡Es hora de planear tu próximo destino!</p>
+    <button routerLink="/cliente/cotizar" class="bg-ecuavip-blue text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-ecuavip-blue/20 hover:scale-105 transition-transform">Solicitar Viaje</button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6" *ngIf="!loading">
+    <div *ngFor="let v of getViajesFiltrados()" 
+         [class.opacity-0]="cancellingId === v.viaje_id"
+         [class.scale-95]="cancellingId === v.viaje_id"
+         class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-500 group overflow-hidden relative transform">
+      
+      <!-- Loading Overlay while cancelling -->
+      <div *ngIf="cancellingId === v.viaje_id" class="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-10 flex items-center justify-center">
+        <div class="animate-spin h-8 w-8 border-4 border-ecuavip-blue border-t-transparent rounded-full"></div>
+      </div>
+
+      <!-- Status Badge -->
+      <div class="flex justify-between items-start mb-6">
+        <span [class]="getStatusColor(v.estado_pago) + ' px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider'">
+          {{ v.estado_pago === 'comprobante_subido' ? 'En Verificación' : v.estado_pago }}
+        </span>
+        <span class="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1 rounded-lg">{{ v.fecha | date:'dd MMM, YYYY' }}</span>
+      </div>
+
+      <!-- Route info -->
+      <div class="space-y-4 mb-8">
+        <div class="flex items-start gap-4">
+          <div class="w-2 h-2 rounded-full bg-ecuavip-blue mt-1.5 shrink-0"></div>
+          <div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-1">Origen</p>
+            <p class="text-sm font-bold text-gray-900 line-clamp-1">{{ v.origen }}</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4">
+          <div class="w-2 h-2 rounded-sm bg-gray-900 mt-1.5 shrink-0"></div>
+          <div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-1">Destino</p>
+            <p class="text-sm font-bold text-gray-900 line-clamp-1">{{ v.destino }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dynamic Actions -->
+      <div class="pt-6 border-t border-gray-50">
+        <!-- PENDIENTE DE PAGO -->
+        <div *ngIf="v.estado_pago === 'pendiente'" class="flex flex-col gap-3">
+          <!-- Countdown Alert -->
+          <div *ngIf="(v.timer$ | async) as rawTimer" 
+               [class]="asTimer(rawTimer).isCritical ? 'bg-red-50 animate-pulse border-red-100' : 'bg-yellow-50 border-yellow-100'"
+               class="p-4 rounded-2xl border flex items-center justify-between transition-all">
+            <div class="flex items-center gap-3">
+              <div [class]="asTimer(rawTimer).isCritical ? 'bg-red-500' : 'bg-yellow-500'" class="w-2 h-2 rounded-full"></div>
+              <div>
+                <p [class]="asTimer(rawTimer).isCritical ? 'text-red-600' : 'text-yellow-700'" class="text-[10px] font-black uppercase tracking-widest">Tiempo Límite</p>
+                <p [class]="asTimer(rawTimer).isCritical ? 'text-red-700' : 'text-yellow-800'" class="text-xs font-bold">Paga antes de que expire</p>
+              </div>
+            </div>
+            <div [class]="asTimer(rawTimer).isCritical ? 'text-red-600' : 'text-yellow-700'" class="text-lg font-black font-mono">
+              {{ asTimer(rawTimer).time }}
+            </div>
+          </div>
+
+          <p class="text-[11px] text-gray-500 font-medium px-1">
+            Tu reserva asegura el asiento por 15 minutos. Sube tu comprobante para confirmar.
+          </p>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <button (click)="cancelarViaje(v.viaje_id)" class="bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 py-4 rounded-2xl font-bold text-xs transition-colors">
+              Cancelar
+            </button>
+            <button [routerLink]="['/cliente/reserva']" [queryParams]="{viajeId: v.viaje_id}" class="bg-ecuavip-blue text-white py-4 rounded-2xl font-black shadow-lg shadow-ecuavip-blue/10">
+              Pagar Ahora
+            </button>
+          </div>
+        </div>
+
+        <!-- PAGADO / ASIGNADO -->
+        <div *ngIf="v.estado_pago === 'aprobado' && v.estado_logistico !== 'finalizado'" class="flex flex-col gap-4">
+          <div *ngIf="v.qr_hash" class="flex items-center gap-4 bg-green-50 p-4 rounded-[1.5rem]">
+            <div class="bg-white p-2 rounded-xl shadow-sm">
+              <qrcode [qrdata]="v.qr_hash" [width]="60" [errorCorrectionLevel]="'M'"></qrcode>
+            </div>
+            <div>
+              <p class="text-xs font-black text-green-800">¡Pago Aprobado!</p>
+              <p class="text-[10px] text-green-700 font-medium">Muestra este QR al chofer al abordar.</p>
+            </div>
+          </div>
+          <button [routerLink]="['/cliente/en-curso']" [queryParams]="{id: v.viaje_id}" class="w-full bg-ecuavip-dark text-white py-4 rounded-2xl font-black flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Rastrear en Vivo
+          </button>
+        </div>
+
+        <!-- RECHAZADO -->
+        <div *ngIf="v.estado_pago === 'rechazado'" class="flex flex-col gap-4">
+          <!-- Countdown Alert for Rejected -->
+          <div *ngIf="(v.timer$ | async) as rawTimer" 
+               [class]="asTimer(rawTimer).isCritical ? 'bg-red-50 animate-pulse border-red-100' : 'bg-yellow-50 border-yellow-100'"
+               class="p-4 rounded-2xl border flex items-center justify-between transition-all">
+            <div class="flex items-center gap-3">
+              <div [class]="asTimer(rawTimer).isCritical ? 'bg-red-500' : 'bg-yellow-500'" class="w-2 h-2 rounded-full"></div>
+              <div>
+                <p [class]="asTimer(rawTimer).isCritical ? 'text-red-600' : 'text-yellow-700'" class="text-[10px] font-black uppercase tracking-widest">Tiempo Restante</p>
+                <p [class]="asTimer(rawTimer).isCritical ? 'text-red-700' : 'text-yellow-800'" class="text-xs font-bold">Aún puedes reintentar</p>
+              </div>
+            </div>
+            <div [class]="asTimer(rawTimer).isCritical ? 'text-red-600' : 'text-yellow-700'" class="text-lg font-black font-mono">
+              {{ asTimer(rawTimer).time }}
+            </div>
+          </div>
+
+          <div class="bg-red-50 p-4 rounded-2xl border border-red-100 flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-red-500"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>
+              <p class="text-red-600 text-[10px] font-black uppercase tracking-widest">Pago Rechazado</p>
+              <p class="text-red-700 text-xs font-bold">Verifica tu comprobante e intenta de nuevo.</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-3">
+            <button (click)="cancelarViaje(v.viaje_id)" class="bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 py-4 rounded-2xl font-bold text-xs transition-colors">
+              Cancelar
+            </button>
+            <button [routerLink]="['/cliente/reserva']" 
+                    [queryParams]="{
+                      viajeId: v.viaje_id, 
+                      origen: v.origen, 
+                      destino: v.destino, 
+                      tarifa: v.monto, 
+                      tipo: v.tipo_servicio,
+                      reintentar: true
+                    }" 
+                    class="bg-ecuavip-blue text-white py-4 rounded-2xl font-black shadow-lg">
+              Reintentar
+            </button>
+          </div>
+        </div>
+
+        <!-- FINALIZADO -->
+        <div *ngIf="v.estado_logistico === 'finalizado'" class="flex gap-3">
+          <button class="flex-1 bg-gray-100 text-gray-500 py-3 rounded-2xl font-bold text-sm">Ver Factura</button>
+          <button class="flex-1 bg-ecuavip-blue/10 text-ecuavip-blue py-3 rounded-2xl font-bold text-sm">Calificar</button>
+        </div>
+      </div>
+
+      <!-- Decoración -->
+      <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-ecuavip-blue/5 rounded-full blur-2xl group-hover:bg-ecuavip-blue/10 transition-colors"></div>
+    </div>
+  </div>
+  
+  <!-- Custom Cancel Confirmation Modal -->
+  <div *ngIf="showCancelModal" class="fixed inset-0 z-[200] flex items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-ecuavip-dark/40 backdrop-blur-sm" (click)="cerrarModalCancelacion()"></div>
+    
+    <!-- Modal Content -->
+    <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl relative animate-fade-in-up">
+      <div class="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </div>
+      
+      <h3 class="text-xl font-black text-ecuavip-dark text-center mb-2">¿Cancelar Reservación?</h3>
+      <p class="text-gray-500 text-center text-sm font-medium mb-8">
+        Esta acción liberará tu asiento de inmediato y no se puede deshacer.
+      </p>
+      
+      <div class="flex flex-col gap-3">
+        <button (click)="confirmarCancelacion()" class="w-full bg-red-500 text-white py-4 rounded-2xl font-black shadow-lg shadow-red-500/20 hover:bg-red-600 transition-colors">
+          Sí, Cancelar Ahora
+        </button>
+        <button (click)="cerrarModalCancelacion()" class="w-full bg-gray-50 text-gray-500 py-4 rounded-2xl font-bold hover:bg-gray-100 transition-colors">
+          Mantener Reserva
+        </button>
+      </div>
+    </div>
+  <!-- Toast Notification -->
+  <div *ngIf="toast.type" 
+       class="fixed top-6 right-6 z-[300] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border bg-white transition-all duration-500 animate-fade-in-right"
+       [ngClass]="{
+         'border-green-100 text-green-600': toast.type === 'success',
+         'border-red-100 text-red-600': toast.type === 'error',
+         'border-blue-100 text-blue-600': toast.type === 'info'
+       }">
+    <div class="w-2 h-2 rounded-full" 
+         [ngClass]="{
+           'bg-green-500': toast.type === 'success',
+           'bg-red-500': toast.type === 'error',
+           'bg-blue-500': toast.type === 'info'
+         }"></div>
+    <span class="text-sm font-black tracking-tight">{{ toast.message }}</span>
+  </div>
+</div>

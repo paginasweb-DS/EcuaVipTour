@@ -1,0 +1,180 @@
+<div class="space-y-8 p-2">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+    <div>
+      <h1 class="text-3xl font-black text-ecuavip-dark tracking-tight">Gestión Financiera</h1>
+      <p class="text-sm text-gray-400 mt-1 font-medium italic">Valida transferencias y genera tickets de abordaje en tiempo real.</p>
+    </div>
+    <button (click)="cargarPagos()" class="bg-white text-ecuavip-blue hover:bg-ecuavip-blue hover:text-white p-3 rounded-2xl shadow-sm border border-gray-100 transition-all duration-300 group" title="Actualizar">
+      <svg class="group-hover:rotate-180 transition-transform duration-500" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    </button>
+  </div>
+
+  <!-- Tabs Estilo Moderno -->
+  <div class="bg-gray-100/50 backdrop-blur-sm rounded-[1.75rem] p-1.5 inline-flex gap-2 border border-gray-200/30 shadow-inner">
+    <button (click)="setTab('pendientes')" 
+            [ngClass]="currentTab === 'pendientes' ? 'bg-white text-ecuavip-blue shadow-md' : 'text-gray-500 hover:bg-white/50'"
+            class="px-6 py-2.5 rounded-2xl text-sm font-black transition-all duration-300 tracking-wide">
+      Pendientes
+    </button>
+    <button (click)="setTab('aprobados')" 
+            [ngClass]="currentTab === 'aprobados' ? 'bg-white text-ecuavip-blue shadow-md' : 'text-gray-500 hover:bg-white/50'"
+            class="px-6 py-2.5 rounded-2xl text-sm font-black transition-all duration-300 tracking-wide">
+      Aprobados
+    </button>
+    <button (click)="setTab('rechazados')" 
+            [ngClass]="currentTab === 'rechazados' ? 'bg-white text-ecuavip-blue shadow-md' : 'text-gray-500 hover:bg-white/50'"
+            class="px-6 py-2.5 rounded-2xl text-sm font-black transition-all duration-300 tracking-wide">
+      Rechazados
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center items-center py-20">
+    <div class="animate-spin h-10 w-10 border-4 border-ecuavip-blue border-t-transparent rounded-full"></div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && pagos.length === 0" class="bg-white rounded-[2.5rem] p-20 text-center shadow-xl shadow-gray-200/50 border border-gray-50">
+    <div class="w-20 h-20 bg-gray-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
+      <svg class="text-gray-200" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    </div>
+    <h3 class="text-xl font-black text-gray-900">Bandeja Vacía</h3>
+    <p class="text-gray-400 mt-2">No se encontraron pagos en la categoría <span class="text-ecuavip-blue font-bold uppercase">{{currentTab}}</span>.</p>
+  </div>
+
+  <!-- Lista de Tarjetas Estilo Grid -->
+  <div *ngIf="!loading && pagos.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div *ngFor="let pago of pagos" 
+         [class.opacity-0]="processingId === pago.pago_id"
+         [class.scale-95]="processingId === pago.pago_id"
+         class="bg-white rounded-[2.2rem] shadow-xl shadow-gray-200/40 border border-gray-100 p-7 flex flex-col hover:-translate-y-2 transition-all duration-500 group relative transform">
+      
+      <!-- Card Loader Overlay -->
+      <div *ngIf="processingId === pago.pago_id" class="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-10 flex items-center justify-center rounded-[2.2rem]">
+        <div class="animate-spin h-8 w-8 border-4 border-ecuavip-blue border-t-transparent rounded-full"></div>
+      </div>
+
+      <div class="flex justify-between items-start mb-6">
+        <div class="space-y-1">
+          <span *ngIf="pago.estado_pago === 'comprobante_subido'" class="inline-flex px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-yellow-400/10 text-yellow-600 border border-yellow-400/20">
+            Pendiente
+          </span>
+          <span *ngIf="pago.estado_pago === 'aprobado'" class="inline-flex px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-green-400/10 text-green-600 border border-green-400/20">
+            Aprobado
+          </span>
+          <span *ngIf="pago.estado_pago === 'rechazado'" class="inline-flex px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-red-400/10 text-red-600 border border-red-400/20">
+            Rechazado
+          </span>
+        </div>
+        <div class="text-right">
+          <p class="text-2xl font-black text-gray-900 leading-none">${{ pago.monto }}</p>
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Monto Total</span>
+        </div>
+      </div>
+
+      <div class="space-y-5 flex-1 bg-gray-50/50 p-5 rounded-[1.5rem] border border-gray-100">
+        <div>
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pasajero Principal</p>
+          <p class="text-base font-extrabold text-gray-900">{{ pago.cliente_nombre }}</p>
+        </div>
+        <div>
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Itinerario del Viaje</p>
+          <div class="flex items-start gap-2">
+            <div class="mt-1 w-2 h-2 rounded-full bg-ecuavip-blue shrink-0"></div>
+            <p class="text-xs font-bold text-gray-700 truncate">{{ pago.origen }}</p>
+          </div>
+          <div class="ml-1 w-0.5 h-3 bg-gray-200"></div>
+          <div class="flex items-start gap-2">
+            <div class="mt-1 w-2 h-2 rounded-full border-2 border-ecuavip-blue shrink-0"></div>
+            <p class="text-xs font-bold text-gray-700 truncate">{{ pago.destino }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción Estilo Moderno -->
+      <div class="flex gap-3 mt-8">
+        <button (click)="verComprobante(pago)" class="flex-1 bg-ecuavip-dark text-white font-black text-xs py-4 rounded-[1.25rem] hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 flex justify-center items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          Revisar
+        </button>
+        <button (click)="abrirChat(pago.viaje_id)" class="w-14 h-14 flex items-center justify-center bg-gray-100 text-gray-400 rounded-[1.25rem] hover:bg-ecuavip-blue hover:text-white transition-all duration-300 shadow-inner group-hover:bg-ecuavip-blue/5 group-hover:text-ecuavip-blue">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- El modal clásico se mantiene con la misma lógica de negocio pero con estilo premium (como en mensajeria) -->
+<div *ngIf="showModal && selectedPago" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ecuavip-dark/40 backdrop-blur-md animate-fade-in">
+  <!-- (Estructura del modal similar a mensajeria.component.html para consistencia) -->
+  <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden relative">
+    <button (click)="cerrarModal()" class="absolute top-6 right-6 bg-gray-100 text-gray-500 p-2.5 rounded-2xl hover:bg-red-500 hover:text-white z-10 transition-all shadow-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <div *ngIf="!qrHashGenerado" class="flex-1 overflow-y-auto">
+      <div class="grid md:grid-cols-2 h-full">
+        <div class="bg-gray-50 flex items-center justify-center p-8 min-h-[400px]">
+          <img [src]="selectedPago.comprobante_url" alt="Comprobante" class="max-w-full max-h-full object-contain rounded-[1.5rem] shadow-2xl">
+        </div>
+        <div class="p-10 flex flex-col justify-center">
+          <div class="mb-8 text-center md:text-left">
+            <h2 class="text-3xl font-black text-gray-900 tracking-tighter">Validación</h2>
+            <p class="text-sm text-gray-400 mt-1 font-bold tracking-widest uppercase">Viaje #{{selectedPago.viaje_id}}</p>
+          </div>
+          <div class="space-y-6 flex-1">
+             <div class="bg-ecuavip-blue/5 p-6 rounded-[2rem] border border-ecuavip-blue/10">
+                <span class="text-[10px] text-ecuavip-blue font-black uppercase tracking-widest">Total a Verificar</span>
+                <p class="text-4xl font-black text-ecuavip-dark mt-1">${{ selectedPago.monto }}</p>
+             </div>
+             <div class="px-2">
+                <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Pasajero</p>
+                <p class="text-lg font-extrabold text-gray-800">{{ selectedPago.cliente_nombre }}</p>
+             </div>
+          </div>
+          <!-- Acciones -->
+          <div *ngIf="selectedPago.estado_pago === 'comprobante_subido'">
+             <div *ngIf="isRejecting" class="mt-8 animate-fade-in-up">
+                <textarea [(ngModel)]="motivoRechazo" class="w-full bg-red-50 border-none rounded-2xl p-4 text-sm focus:ring-2 focus:ring-red-200 transition-all mb-4" rows="2" placeholder="Motivo..."></textarea>
+                <div class="flex gap-2">
+                   <button (click)="isRejecting = false" class="flex-1 py-4 text-xs font-black text-gray-500 rounded-2xl">Cancelar</button>
+                   <button (click)="rechazar()" class="flex-1 py-4 bg-red-500 text-white text-xs font-black rounded-2xl">Rechazar</button>
+                </div>
+             </div>
+             <div *ngIf="!isRejecting" class="grid grid-cols-2 gap-4 mt-10">
+                <button (click)="iniciarRechazo()" class="py-4 rounded-2xl font-black text-xs border-2 border-gray-100 text-red-500 hover:bg-red-50">Rechazar</button>
+                <button (click)="aprobar()" class="py-4 rounded-2xl font-black text-xs bg-green-500 text-white shadow-xl shadow-green-500/20">Aprobar</button>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Exito -->
+    <div *ngIf="qrHashGenerado" class="flex flex-col items-center justify-center p-16 text-center animate-scale-in">
+       <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 text-green-500">
+         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+       </div>
+       <h2 class="text-3xl font-black text-gray-900 mb-8">Pago Validado</h2>
+       <div class="bg-white p-6 rounded-[2.5rem] shadow-2xl border border-gray-100">
+          <qrcode [qrdata]="qrHashGenerado" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Global Admin Toast -->
+<div *ngIf="toast.type" 
+     class="fixed top-6 right-6 z-[300] flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border bg-white transition-all duration-500 animate-fade-in-right"
+     [ngClass]="{
+       'border-green-100 text-green-600': toast.type === 'success',
+       'border-red-100 text-red-600': toast.type === 'error',
+       'border-blue-100 text-blue-600': toast.type === 'info'
+     }">
+  <div class="w-2 h-2 rounded-full" 
+       [ngClass]="{
+         'bg-green-500': toast.type === 'success',
+         'bg-red-500': toast.type === 'error',
+         'bg-blue-500': toast.type === 'info'
+       }"></div>
+  <span class="text-sm font-black tracking-tight">{{ toast.message }}</span>
+</div>

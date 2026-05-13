@@ -1,0 +1,94 @@
+<div class="flex flex-col h-full bg-gray-50/50 relative overflow-hidden font-sans">
+  
+  <!-- Header -->
+  <div class="bg-ecuavip-blue px-5 py-4 text-white shadow-sm flex-shrink-0 z-10 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div>
+        <h3 class="font-bold leading-tight">Chat de Asistencia</h3>
+        <p class="text-xs text-white/80">Viaje #{{ viajeId }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex-1 flex justify-center items-center">
+    <div class="animate-spin h-8 w-8 border-4 border-ecuavip-blue border-t-transparent rounded-full"></div>
+  </div>
+
+  <!-- Mensajes -->
+  <div *ngIf="!loading" #scrollMe class="flex-1 overflow-y-auto p-5 space-y-4">
+    
+    <div *ngIf="mensajes.length === 0" class="h-full flex flex-col items-center justify-center text-gray-400">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-3 opacity-50"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <p class="text-sm font-medium">No hay mensajes aún.</p>
+      <p class="text-xs">Escribe algo para comenzar a chatear.</p>
+    </div>
+
+    <ng-container *ngFor="let msg of mensajes; let i = index">
+      <!-- Trip Separator Label -->
+      <div *ngIf="msg.isNewTrip" class="flex items-center gap-3 my-8 opacity-70">
+        <div class="h-[1px] flex-1 bg-gray-200"></div>
+        <div class="flex flex-col items-center">
+          <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Conversación sobre Viaje #{{ msg.viaje_id }}</span>
+          <span *ngIf="msg.viaje_info" 
+                [ngClass]="{
+                  'bg-green-100 text-green-600 border-green-200': msg.viaje_info.estado === 'aprobado' || msg.viaje_info.estado === 'completado',
+                  'bg-red-100 text-red-600 border-red-200': msg.viaje_info.estado === 'cancelado' || msg.viaje_info.estado === 'rechazado',
+                  'bg-yellow-100 text-yellow-600 border-yellow-200': msg.viaje_info.estado === 'pendiente'
+                }"
+                class="mt-1 px-3 py-0.5 rounded-full text-[8px] font-black uppercase border">
+            {{ msg.viaje_info.estado }}
+          </span>
+        </div>
+        <div class="h-[1px] flex-1 bg-gray-200"></div>
+      </div>
+
+      <!-- Bubble -->
+      <div class="flex flex-col" [ngClass]="msg.remitente_id === usuario.id ? 'items-end' : 'items-start'">
+        
+        <!-- Sender Label -->
+        <span class="text-[10px] text-gray-400 font-bold uppercase mb-1 px-1">
+          {{ msg.remitente_id === usuario.id ? 'Tú' : (msg.remitente_id === 1 ? 'Administración' : 'Cliente') }}
+        </span>
+
+        <!-- Bubble Box -->
+        <div 
+          class="max-w-[85%] px-4 py-2.5 rounded-2xl shadow-sm text-sm break-words relative"
+          [ngClass]="msg.remitente_id === usuario.id ? 'bg-ecuavip-blue text-white rounded-br-sm' : 'bg-white text-gray-800 border border-gray-100 rounded-bl-sm'">
+          {{ msg.contenido }}
+        </div>
+
+        <!-- Time -->
+        <span class="text-[10px] text-gray-400 mt-1 px-1">
+          {{ msg.timestamp | slice:11:16 }}
+        </span>
+      </div>
+    </ng-container>
+
+  </div>
+
+  <!-- Input Area -->
+  <div class="bg-white border-t border-gray-100 p-4 flex-shrink-0">
+    <form (ngSubmit)="enviar()" class="flex items-end gap-2 relative">
+      <textarea 
+        [(ngModel)]="nuevoMensaje" 
+        name="mensaje" 
+        rows="1"
+        placeholder="Escribe un mensaje..."
+        class="flex-1 bg-gray-50 border border-gray-200 rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ecuavip-blue/50 focus:bg-white resize-none text-sm leading-tight max-h-32 transition-all"
+        (keydown.enter)="$event.preventDefault(); enviar()"
+      ></textarea>
+      
+      <button 
+        type="submit" 
+        [disabled]="!nuevoMensaje.trim()"
+        class="bg-ecuavip-blue text-white p-3 rounded-full hover:bg-ecuavip-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </form>
+  </div>
+
+</div>

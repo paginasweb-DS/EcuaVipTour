@@ -1,0 +1,230 @@
+<div class="h-[calc(100vh-100px)] -m-6 md:-m-8 bg-gray-50 flex overflow-hidden p-4 md:p-6 gap-6">
+  
+  <!-- Lista de Chats (Inbox) -->
+  <div class="w-full md:w-80 lg:w-96 flex flex-col h-full shrink-0 animate-fade-in" 
+       [ngClass]="{'hidden md:flex': selectedClienteId !== null}">
+    
+    <!-- Contenedor del Inbox con bordes redondeados y sombra suave -->
+    <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col h-full overflow-hidden">
+      <div class="p-6 border-b border-gray-50 shrink-0">
+        <h2 class="text-2xl font-black text-ecuavip-dark tracking-tight">Mensajes</h2>
+        <p class="text-xs text-gray-400 mt-1 font-medium">Bandeja de entrada centralizada</p>
+        
+        <!-- Buscador Estilo SportHub -->
+        <div class="mt-4 relative">
+          <input type="text" placeholder="Buscar conversación..." 
+                 class="w-full bg-gray-50 border-none rounded-2xl py-3 pl-11 pr-4 text-sm focus:ring-2 focus:ring-ecuavip-blue/20 transition-all">
+          <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
+        <div *ngIf="loading" class="p-8 flex justify-center">
+          <div class="animate-spin h-6 w-6 border-2 border-ecuavip-blue border-t-transparent rounded-full"></div>
+        </div>
+
+        <div *ngIf="!loading && inbox.length === 0" class="p-8 text-center text-gray-400">
+          <p class="text-sm">No hay conversaciones activas.</p>
+        </div>
+
+        <ng-container *ngIf="!loading">
+          <div *ngFor="let chat of inbox" 
+               (click)="seleccionarChat(chat.cliente_id)"
+               class="p-4 rounded-[1.5rem] cursor-pointer transition-all duration-300 relative group"
+               [ngClass]="selectedClienteId === chat.cliente_id ? 'bg-ecuavip-blue text-white shadow-lg shadow-ecuavip-blue/20 translate-x-1' : 'hover:bg-gray-50 text-gray-600'">
+            
+            <div class="flex gap-4 items-center">
+              <!-- Avatar con borde y estado -->
+              <div class="relative">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm border-2 transition-colors"
+                     [ngClass]="selectedClienteId === chat.cliente_id ? 'bg-white/20 border-white/30 text-white' : 'bg-gray-100 border-transparent text-gray-500'">
+                  {{ chat.cliente_nombre.charAt(0) | uppercase }}
+                </div>
+              </div>
+              
+              <div class="flex-1 min-w-0 pr-6"> <!-- Añadido padding derecho para el badge -->
+                <div class="flex justify-between items-baseline mb-0.5">
+                  <h4 class="font-bold truncate" [ngClass]="selectedClienteId === chat.cliente_id ? 'text-white' : 'text-gray-900'">
+                    {{ chat.cliente_nombre }}
+                  </h4>
+                  <span class="text-[10px] shrink-0 ml-2" [ngClass]="selectedClienteId === chat.cliente_id ? 'text-white/70' : 'text-gray-400'">
+                    {{ chat.fecha_ultimo_mensaje | date:'HH:mm' }}
+                  </span>
+                </div>
+                <p class="text-xs truncate opacity-80" [ngClass]="{'font-bold opacity-100': chat.unread > 0}">
+                  {{ chat.ultimo_mensaje }}
+                </p>
+              </div>
+
+              <!-- Contador de Mensajes a la Derecha (Estilo SportHub) -->
+              <div *ngIf="chat.unread > 0" class="absolute right-6 top-1/2 -translate-y-1/2">
+                <div class="w-6 h-6 bg-green-500 text-white text-[10px] font-black flex items-center justify-center rounded-full border-2 border-white shadow-lg shadow-green-500/20">
+                  {{ chat.unread }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Indicador de Estado Flotante -->
+            <div class="mt-2 flex items-center gap-2">
+              <span class="text-[9px] font-black px-2 py-0.5 rounded-lg uppercase tracking-wider"
+                    [ngClass]="{
+                       'bg-yellow-400 text-yellow-900': chat.estado_pago === 'comprobante_subido',
+                       'bg-green-400 text-green-900': chat.estado_pago === 'aprobado',
+                       'bg-gray-200 text-gray-600': chat.estado_pago !== 'comprobante_subido' && chat.estado_pago !== 'aprobado',
+                       'opacity-50': selectedClienteId === chat.cliente_id
+                     }">
+                {{ chat.estado_pago === 'comprobante_subido' ? 'Pago Pendiente' : chat.estado_pago }}
+              </span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Área de Chat Activo -->
+  <div class="flex-1 flex flex-col h-full relative animate-fade-in"
+       [ngClass]="{'hidden md:flex': selectedClienteId === null}">
+    
+    <!-- Contenedor del Chat con bordes redondeados -->
+    <div class="bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col h-full overflow-hidden relative">
+      
+      <!-- Header del Chat Premium -->
+      <div *ngIf="selectedChat" class="h-20 px-8 flex items-center justify-between shrink-0 border-b border-gray-50 z-10 bg-white/80 backdrop-blur-md">
+        <div class="flex items-center gap-4">
+          <button (click)="selectedClienteId = null" class="md:hidden p-2 -ml-2 text-gray-500 hover:bg-gray-100 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          
+          <div class="w-10 h-10 rounded-xl bg-ecuavip-blue/10 text-ecuavip-blue flex items-center justify-center font-bold">
+            {{ selectedChat.cliente_nombre.charAt(0) }}
+          </div>
+          <div>
+            <h3 class="font-extrabold text-gray-900 leading-tight">{{ selectedChat.cliente_nombre }}</h3>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">En línea • Viaje #{{ selectedChat.viaje_id }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions Toolbar Floating Style -->
+        <div class="flex gap-2 p-1.5 bg-gray-50 rounded-2xl border border-gray-100" *ngIf="selectedChat.estado_pago === 'comprobante_subido'">
+          <button (click)="verComprobante()" class="px-4 py-2 bg-white hover:bg-gray-100 text-gray-700 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-ecuavip-blue"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            Comprobante
+          </button>
+          <button (click)="aprobarPago()" [disabled]="processingId === selectedChat.pago_id" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-green-500/20 disabled:opacity-50 flex items-center gap-2">
+            <div *ngIf="processingId === selectedChat.pago_id" class="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full"></div>
+            Aprobar
+          </button>
+        </div>
+
+        <div *ngIf="selectedChat.estado_pago === 'aprobado'" class="px-4 py-2 bg-green-50 text-green-600 rounded-xl border border-green-100 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span class="text-[10px] font-black uppercase tracking-widest">Pago Verificado</span>
+        </div>
+      </div>
+
+      <!-- Empty State Premium -->
+      <div *ngIf="!selectedClienteId" class="flex-1 flex flex-col items-center justify-center p-12 text-center">
+        <div class="w-24 h-24 bg-gray-50 rounded-[2rem] flex items-center justify-center mb-6 shadow-inner">
+          <svg class="text-gray-200" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3 class="text-xl font-extrabold text-gray-900 mb-2">Selecciona un chat</h3>
+        <p class="text-gray-400 max-w-xs text-sm">Elige una conversación de la izquierda para comenzar a gestionar el viaje.</p>
+      </div>
+
+      <!-- Panel de Chat Integrado -->
+      <div *ngIf="selectedClienteId" class="flex-1 overflow-hidden relative">
+        <app-chat-panel [otroId]="selectedClienteId" [viajeId]="selectedChat?.viaje_id" class="h-full block w-full absolute inset-0"></app-chat-panel>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Validación Estilo SportHub (Vidrio/Blur) -->
+<div *ngIf="showModal && selectedChat" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ecuavip-dark/40 backdrop-blur-md animate-fade-in">
+  <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden relative border border-white/20">
+    
+    <button (click)="cerrarModal()" class="absolute top-6 right-6 bg-gray-100 text-gray-500 p-2.5 rounded-2xl hover:bg-red-500 hover:text-white z-10 transition-all duration-300 shadow-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+
+    <div *ngIf="!qrHashGenerado" class="flex-1 overflow-y-auto">
+      <div class="grid md:grid-cols-2 h-full">
+        <!-- Izquierda: Imagen con zoom suave -->
+        <div class="bg-gray-50 flex items-center justify-center p-8 min-h-[350px]">
+          <img [src]="selectedChat.comprobante_url" alt="Comprobante" 
+               class="max-w-full max-h-full object-contain rounded-[1.5rem] shadow-2xl transition-transform hover:scale-105 duration-500">
+        </div>
+        
+        <!-- Derecha: Detalles Premium -->
+        <div class="p-8 md:p-10 flex flex-col">
+          <div class="mb-8">
+            <span class="text-[10px] font-black text-ecuavip-blue bg-ecuavip-blue/10 px-3 py-1 rounded-lg uppercase tracking-widest">Validación de Pago</span>
+            <h2 class="text-2xl font-black text-gray-900 mt-2">Detalle del Depósito</h2>
+          </div>
+          
+          <div class="space-y-6 flex-1">
+            <div class="bg-gray-50 p-6 rounded-[1.5rem] border border-gray-100">
+              <span class="text-xs text-gray-400 font-bold uppercase tracking-tighter">Monto Transferido</span>
+              <div class="flex items-baseline gap-1 mt-1">
+                <span class="text-3xl font-black text-ecuavip-dark">${{ selectedChat.monto }}</span>
+                <span class="text-sm font-bold text-green-500">USD</span>
+              </div>
+            </div>
+            
+            <div class="px-2">
+              <span class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Cliente Registrado</span>
+              <p class="text-base font-extrabold text-gray-800 mt-1">{{ selectedChat.cliente_nombre }}</p>
+            </div>
+          </div>
+
+          <!-- Acciones Dinámicas -->
+          <div *ngIf="isRejecting" class="mt-8 animate-fade-in-up">
+            <textarea [(ngModel)]="motivoRechazo" 
+                      class="w-full bg-red-50 border-2 border-red-100 rounded-[1.25rem] p-4 text-sm focus:outline-none focus:ring-4 focus:ring-red-100 transition-all mb-4" 
+                      rows="3" placeholder="Escribe el motivo del rechazo..."></textarea>
+            
+            <div class="flex gap-3">
+              <button (click)="isRejecting = false" class="flex-1 py-4 text-sm font-bold text-gray-500 hover:bg-gray-100 rounded-2xl transition-all">Cancelar</button>
+              <button (click)="rechazar()" [disabled]="processingId === selectedChat.pago_id || !motivoRechazo.trim()" 
+                      class="flex-1 py-4 text-sm font-bold bg-red-500 text-white hover:bg-red-600 rounded-2xl shadow-lg shadow-red-500/30 transition-all disabled:opacity-50">
+                Confirmar
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="!isRejecting && selectedChat.estado_pago === 'comprobante_subido'" class="grid grid-cols-2 gap-4 mt-10">
+            <button (click)="iniciarRechazo()" class="w-full py-4 rounded-2xl font-extrabold border-2 border-red-50 text-red-500 hover:bg-red-50 transition-all">
+              Rechazar
+            </button>
+            <button (click)="aprobarPago()" [disabled]="processingId === selectedChat.pago_id" 
+                    class="w-full py-4 rounded-2xl font-extrabold bg-ecuavip-blue text-white shadow-xl shadow-ecuavip-blue/30 hover:scale-[1.02] active:scale-95 transition-all flex justify-center items-center gap-2">
+              <div *ngIf="processingId === selectedChat.pago_id" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+              {{ processingId === selectedChat.pago_id ? 'Procesando' : 'Aprobar' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Éxito Premium (QR) -->
+    <div *ngIf="qrHashGenerado" class="flex flex-col items-center justify-center p-12 text-center animate-scale-in">
+      <div class="w-24 h-24 bg-green-100 rounded-[2rem] flex items-center justify-center mb-8 shadow-inner">
+        <svg class="text-green-500" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </div>
+      <h2 class="text-4xl font-black text-gray-900 mb-3 tracking-tighter">¡Reserva Lista!</h2>
+      <p class="text-gray-400 mb-10 max-w-sm text-lg font-medium leading-tight">El ticket QR ha sido enviado al dispositivo del cliente exitosamente.</p>
+      
+      <div class="bg-gray-50 p-10 rounded-[3rem] border-2 border-dashed border-gray-200 shadow-sm relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-4 text-[10px] font-black text-gray-400 tracking-[0.3em] uppercase">Boleto Digital</div>
+        <div class="bg-white p-6 rounded-[2rem] shadow-2xl">
+          <qrcode [qrdata]="qrHashGenerado" [width]="220" [errorCorrectionLevel]="'M'"></qrcode>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

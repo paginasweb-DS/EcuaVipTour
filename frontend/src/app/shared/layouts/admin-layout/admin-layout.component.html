@@ -1,0 +1,76 @@
+<div class="flex h-screen bg-gray-50 font-sans">
+  
+  <!-- Sidebar -->
+  <aside 
+    class="bg-ecuavip-dark text-white w-64 flex-shrink-0 flex flex-col transition-all duration-300"
+    [class.-ml-64]="!isSidebarOpen">
+    
+    <!-- Header Sidebar -->
+    <div class="h-20 flex items-center px-6 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <img src="assets/logo.png" alt="Logo" class="h-10 w-auto object-contain">
+        <span class="text-xl font-extrabold tracking-tight">Admin<span class="text-ecuavip-blue">Panel</span></span>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
+      <a routerLink="/admin/pagos" routerLinkActive="bg-ecuavip-blue/20 text-white border-l-4 border-ecuavip-blue" class="flex justify-between items-center px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+        <div class="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+          <span class="font-medium">Validación Pagos</span>
+        </div>
+      </a>
+
+      <a routerLink="/admin/mensajeria" routerLinkActive="bg-ecuavip-blue/20 text-white border-l-4 border-ecuavip-blue" class="flex justify-between items-center px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+        <div class="flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="font-medium">Mensajería</span>
+        </div>
+        <span *ngIf="notificacionesNuevas > 0" class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-bounce">
+          {{ notificacionesNuevas }}
+        </span>
+      </a>
+
+      <a routerLink="/admin/monitor" routerLinkActive="bg-ecuavip-blue/20 text-white border-l-4 border-ecuavip-blue" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="font-medium">Monitoreo Flota</span>
+      </a>
+
+      <a routerLink="/admin/vehiculos" routerLinkActive="bg-ecuavip-blue/20 text-white border-l-4 border-ecuavip-blue" class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+        <span class="font-medium">Vehículos</span>
+      </a>
+    </nav>
+
+    <!-- Logout -->
+    <div class="p-4 border-t border-white/10">
+      <button (click)="logout()" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        <span class="font-medium">Cerrar Sesión</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Navbar Superior -->
+    <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-10">
+      <button (click)="toggleSidebar()" class="text-gray-500 hover:bg-gray-100 p-2 rounded-lg transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </button>
+
+      <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-ecuavip-blue text-white rounded-full flex items-center justify-center font-bold shadow-md">
+          A
+        </div>
+      </div>
+    </header>
+
+    <!-- Router Outlet para el contenido Admin -->
+    <main class="flex-1 overflow-y-auto p-6 md:p-8 bg-gray-50">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+</div>
