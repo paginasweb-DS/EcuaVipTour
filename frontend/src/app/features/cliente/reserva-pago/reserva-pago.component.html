@@ -40,6 +40,7 @@
           <div class="mt-2 text-sm text-gray-600 space-y-1">
              <p><strong>Servicio:</strong> <span class="capitalize">{{ reservaParams.tipo }}</span></p>
              <p *ngIf="reservaParams.tipo === 'pasajero'"><strong>Pasajeros:</strong> {{ reservaParams.pasajeros }}</p>
+             <p *ngIf="reservaParams.tipo === 'pasajero' && obtenerAsientosString()"><strong>Asiento(s):</strong> <span class="text-ecuavip-blue font-bold">{{ obtenerAsientosString() }}</span></p>
              <p *ngIf="reservaParams.hora"><strong>Hora salida:</strong> {{ reservaParams.hora }}</p>
           </div>
         </div>

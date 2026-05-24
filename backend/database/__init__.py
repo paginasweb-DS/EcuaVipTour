@@ -1,5 +1,5 @@
 from .db import db
-from .models import Usuario, Viaje, Vehiculo, Pago, MensajeChat, TicketQR, Calificacion
+from .models import Usuario, Viaje, Vehiculo, Pago, MensajeChat, TicketQR, Calificacion, ReservaAsiento
 
 __all__ = [
     'db',
@@ -9,5 +9,6 @@ __all__ = [
     'Pago',
     'MensajeChat',
     'TicketQR',
-    'Calificacion'
+    'Calificacion',
+    'ReservaAsiento'
 ]

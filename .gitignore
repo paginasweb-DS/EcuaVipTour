@@ -152,8 +152,8 @@ cython_debug/
 node_modules/
 dist/
 .angular/
-src/environments/environment.ts
-src/environments/environment.prod.ts
+frontend/src/environments/environment.ts
+frontend/src/environments/environment.prod.ts
 
 # OS files
 .DS_Store

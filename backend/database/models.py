@@ -101,3 +101,12 @@ class MensajeChat(db.Model):
     contenido = db.Column(db.Text, nullable=False)
     leido = db.Column(db.Boolean, default=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class ReservaAsiento(db.Model):
+    __tablename__ = 'reserva_asiento'
+    id = db.Column(db.Integer, primary_key=True)
+    viaje_id = db.Column(db.Integer, db.ForeignKey('viaje.id'))
+    cliente_id = db.Column(db.Integer, db.ForeignKey('usuario.id'))
+    numero_asiento = db.Column(db.Integer, nullable=False)
+    fecha_reserva = db.Column(db.DateTime, default=datetime.utcnow)
+    estado = db.Column(db.String(20), default='pendiente') # 'pendiente', 'confirmado', 'cancelado'

@@ -47,6 +47,10 @@ export class CotizadorComponent implements OnInit, OnDestroy {
   maxPasajeros = 15;
   horaSalida = '04:00 AM';
   
+  mostrarMapaAsientos = false;
+  asientosSeleccionados: number[] = [];
+  asientosOcupados: number[] = [];
+  
   horariosDisponibles: string[] = [
     '04:00 AM', '05:00 AM', '06:00 AM', '07:00 AM', '08:00 AM',
     '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM',
@@ -177,6 +181,9 @@ export class CotizadorComponent implements OnInit, OnDestroy {
   decrementarPasajeros() {
     if (this.numPasajeros > 1) {
       this.numPasajeros--;
+      if (this.asientosSeleccionados.length > this.numPasajeros) {
+        this.asientosSeleccionados = this.asientosSeleccionados.slice(0, this.numPasajeros);
+      }
       this.actualizarCotizacion();
     }
   }
@@ -206,7 +213,27 @@ export class CotizadorComponent implements OnInit, OnDestroy {
       this.tiempoEstimado = '';
       this.cotizacionActual = undefined;
       this.directionsResults$ = new Observable();
+      this.mostrarMapaAsientos = false;
+      this.asientosSeleccionados = [];
     });
+  }
+
+  toggleAsiento(numero: number) {
+    if (this.asientosOcupados.includes(numero)) return;
+    
+    const index = this.asientosSeleccionados.indexOf(numero);
+    if (index > -1) {
+      this.asientosSeleccionados.splice(index, 1);
+    } else {
+      if (this.asientosSeleccionados.length >= this.numPasajeros) {
+        this.asientosSeleccionados.shift();
+      }
+      this.asientosSeleccionados.push(numero);
+    }
+  }
+
+  isAsientoSeleccionado(numero: number): boolean {
+    return this.asientosSeleccionados.includes(numero);
   }
 
   reservar() {
@@ -235,7 +262,8 @@ export class CotizadorComponent implements OnInit, OnDestroy {
         tipo: this.tipoViaje,
         tarifa: this.cotizacionActual.precio_total,
         pasajeros: this.numPasajeros,
-        hora: this.horaSalida
+        hora: this.horaSalida,
+        asientos: JSON.stringify(this.asientosSeleccionados)
       }
     });
   }

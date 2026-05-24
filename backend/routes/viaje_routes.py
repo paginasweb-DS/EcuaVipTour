@@ -88,4 +88,10 @@ def calificar():
     resultado, status_code = viaje_service.calificar_viaje(request.json)
     return jsonify(resultado), status_code
 
+@viaje_bp.route('/<int:viaje_id>/asientos-ocupados', methods=['GET'])
+@jwt_required()
+def get_asientos_ocupados(viaje_id):
+    resultado, status_code = viaje_service.get_asientos_ocupados(viaje_id)
+    return jsonify(resultado), status_code
+
 

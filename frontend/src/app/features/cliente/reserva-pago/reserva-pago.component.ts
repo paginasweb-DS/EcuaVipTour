@@ -119,4 +119,15 @@ export class ReservaPagoComponent implements OnInit {
       });
     }
   }
+
+  obtenerAsientosString(): string {
+    if (!this.reservaParams.asientos) return '';
+    try {
+      const arr = JSON.parse(this.reservaParams.asientos);
+      if (Array.isArray(arr) && arr.length > 0) {
+        return arr.join(', ');
+      }
+    } catch (e) {}
+    return '';
+  }
 }

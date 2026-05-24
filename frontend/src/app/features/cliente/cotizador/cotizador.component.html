@@ -81,6 +81,162 @@
                 <option *ngFor="let hora of horariosDisponibles" [value]="hora">{{ hora }}</option>
               </select>
             </div>
+
+            <!-- Botón para Mostrar/Ocultar Croquis de Asientos -->
+            <div class="mt-3 pt-3 border-t border-gray-100">
+              <button 
+                type="button"
+                (click)="mostrarMapaAsientos = !mostrarMapaAsientos" 
+                class="w-full flex items-center gap-2 py-2 text-xs font-extrabold text-ecuavip-blue hover:text-ecuavip-dark transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.66 0 3-1.34 3-3V7c0-1.66-1.34-3-3-3H5C3.34 4 2 5.34 2 7v4c0 1.66 1.34 3 3 3"/><path d="M2 14v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4"/><path d="M8 4v8"/><path d="M16 4v8"/><path d="M2 9h20"/></svg>
+                Seleccionar Asientos
+              </button>
+              
+              <!-- Contenedor del Mapa de Asientos (Furgoneta de Ecuavip) -->
+              <div 
+                *ngIf="mostrarMapaAsientos" 
+                class="mt-4 p-4 bg-slate-900 text-slate-100 rounded-2xl border border-slate-800 shadow-inner animate-fade-in"
+              >
+                <div class="text-center mb-4">
+                  <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest text-center">Cabina de Pasajeros</p>
+                  <p class="text-[9px] text-slate-400 text-center">Selecciona hasta {{ numPasajeros }} asientos</p>
+                </div>
+                
+                <!-- Estructura de la Furgoneta -->
+                <div class="max-w-[200px] mx-auto bg-slate-950 rounded-3xl p-4 border border-slate-800 relative">
+                  
+                  <!-- Parabrisas y Cabina del Conductor -->
+                  <div class="w-full h-8 bg-slate-800 rounded-t-2xl border-b-4 border-slate-900 mb-4 flex items-center justify-between px-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
+                    <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider text-center">FRENTE</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
+                  </div>
+                  
+                  <!-- Asientos de la Cabina -->
+                  <div class="grid grid-cols-4 gap-2 mb-6">
+                    <!-- Conductor -->
+                    <div class="col-span-2 flex justify-center">
+                      <div class="w-10 h-10 bg-gray-800 text-gray-500 rounded-lg flex flex-col items-center justify-center border border-gray-700/60 select-none cursor-not-allowed" title="Conductor">
+                        <span class="text-[9px] font-black leading-none mb-1 text-center">CHOFER</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="M12 12v9"/></svg>
+                      </div>
+                    </div>
+                    <!-- Espacio vacío central -->
+                    <div class="col-span-1"></div>
+                    <!-- Asiento 1 -->
+                    <div class="col-span-1 flex justify-center">
+                      <button 
+                        type="button"
+                        (click)="toggleAsiento(1)"
+                        [class.bg-blue-600]="isAsientoSeleccionado(1)"
+                        [class.text-white]="isAsientoSeleccionado(1)"
+                        [class.border-blue-700]="isAsientoSeleccionado(1)"
+                        [class.bg-red-500]="asientosOcupados.includes(1)"
+                        [class.text-white]="asientosOcupados.includes(1)"
+                        [class.border-red-600]="asientosOcupados.includes(1)"
+                        [class.cursor-not-allowed]="asientosOcupados.includes(1)"
+                        [class.bg-slate-800]="!isAsientoSeleccionado(1) && !asientosOcupados.includes(1)"
+                        [class.text-slate-300]="!isAsientoSeleccionado(1) && !asientosOcupados.includes(1)"
+                        [class.hover:bg-slate-700]="!isAsientoSeleccionado(1) && !asientosOcupados.includes(1)"
+                        class="w-10 h-10 rounded-lg border border-slate-700 text-xs font-bold transition-all flex items-center justify-center"
+                      >
+                        1
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Pasillo Central y Filas de Pasajeros -->
+                  <div class="space-y-2">
+                    
+                    <!-- Fila 2: Asientos 2, 3, 4 -->
+                    <div class="grid grid-cols-4 gap-2">
+                      <div class="col-span-1 flex justify-center">
+                        <button type="button" (click)="toggleAsiento(2)" [class.bg-blue-600]="isAsientoSeleccionado(2)" [class.bg-red-500]="asientosOcupados.includes(2)" [class.bg-slate-800]="!isAsientoSeleccionado(2) && !asientosOcupados.includes(2)" class="w-10 h-10 rounded-lg border border-slate-700 text-xs font-bold transition-all flex items-center justify-center text-slate-300">2</button>
+                      </div>
+                      <div class="col-span-1 flex justify-center">
+                        <button type="button" (click)="toggleAsiento(3)" [class.bg-blue-600]="isAsientoSeleccionado(3)" [class.bg-red-500]="asientosOcupados.includes(3)" [class.bg-slate-800]="!isAsientoSeleccionado(3) && !asientosOcupados.includes(3)" class="w-10 h-10 rounded-lg border border-slate-700 text-xs font-bold transition-all flex items-center justify-center text-slate-300">3</button>
+                      </div>
+                      <div class="col-span-1"></div> <!-- Pasillo -->
+                      <div class="col-span-1 flex justify-center">
+                        <button type="button" (click)="toggleAsiento(4)" [class.bg-blue-600]="isAsientoSeleccionado(4)" [class.bg-red-500]="asientosOcupados.includes(4)" [class.bg-slate-800]="!isAsientoSeleccionado(4) && !asientosOcupados.includes(4)" class="w-10 h-10 rounded-lg border border-slate-700 text-xs font-bold transition-all flex items-center justify-center text-slate-300">4</button>
+                      </div>
+                    </div>
+                    
+                    <!-- Fila 3: Asientos 5, 6, 7 -->
+                    <div class="grid grid-cols-4 gap-2">
+                      <div class="col-span-1 flex justify-center">
+                        <button type="button" (click)="toggleAsiento(5)" [class.bg-blue-600]="isAsientoSeleccionado(5)" [class.bg-red-500]="asientosOcupados.includes(5)" [class.bg-slate-800]="!isAsientoSeleccionado(5) && !asientosOcupados.includes(5)" class="w-10 h-10 rounded-lg border border-slate-700 text-xs font-bold transition-all flex items-center justify-center text-slate-300">5</button>
+                      </div>
+                      <div class="col-span-1 flex justify-center">
+                        <button type="button" (click)="toggleAsiento(6)" [class.bg-blue-600]="isAsientoSeleccionado(6)" [class.bg-red-500]="asientosOcupados.includes(6)" [class.bg-slate-800]="!isAsientoSeleccionado(6) && !asientosOcupados.includes(6)" class="w-10 h-10 rounded-lg border border-slate-700 text-xs font-bold transition-all flex items-center justify-center text-slate-300">6</button>
+                      </div>
+                      <div class="col-span-1"></div> <!-- Pasillo -->
+                      <div class="col-span-1 flex justify-center">
+                        <button type="button" (click)="toggleAsiento(7)" [class.bg-blue-600]="isAsientoSeleccionado(7)" [class.bg-red-500]="asientosOcupados.includes(7)" [class.bg-slate-800]="!isAsientoSeleccionado(7) && !asientosOcupados.includes(7)" class="w-10 h-10 rounded-lg border border-slate-700 text-xs font-bold transition-all flex items-center justify-center text-slate-300">7</button>
+                      </div>
+                    </div>
+                    
+                    <!-- Fila 4: Asientos 8, 9, 10 -->
+                    <div class="grid grid-cols-4 gap-2">
+                      <div class="col-span-1 flex justify-center">
+                        <button type="button" (click)="toggleAsiento(8)" [class.bg-blue-600]="isAsientoSeleccionado(8)" [class.bg-red-500]="asientosOcupados.includes(8)" [class.bg-slate-800]="!isAsientoSeleccionado(8) && !asientosOcupados.includes(8)" class="w-10 h-10 rounded-lg border border-slate-700 text-xs font-bold transition-all flex items-center justify-center text-slate-300">8</button>
+                      </div>
+                      <div class="col-span-1 flex justify-center">
+                        <button type="button" (click)="toggleAsiento(9)" [class.bg-blue-600]="isAsientoSeleccionado(9)" [class.bg-red-500]="asientosOcupados.includes(9)" [class.bg-slate-800]="!isAsientoSeleccionado(9) && !asientosOcupados.includes(9)" class="w-10 h-10 rounded-lg border border-slate-700 text-xs font-bold transition-all flex items-center justify-center text-slate-300">9</button>
+                      </div>
+                      <div class="col-span-1"></div> <!-- Pasillo -->
+                      <div class="col-span-1 flex justify-center">
+                        <button type="button" (click)="toggleAsiento(10)" [class.bg-blue-600]="isAsientoSeleccionado(10)" [class.bg-red-500]="asientosOcupados.includes(10)" [class.bg-slate-800]="!isAsientoSeleccionado(10) && !asientosOcupados.includes(10)" class="w-10 h-10 rounded-lg border border-slate-700 text-xs font-bold transition-all flex items-center justify-center text-slate-300">10</button>
+                      </div>
+                    </div>
+                    
+                    <!-- Fila 5: Asientos 11, 12, 13, 14, 15 (Última fila completa) -->
+                    <div class="grid grid-cols-5 gap-1.5 pt-2 border-t border-slate-800">
+                      <div class="flex justify-center">
+                        <button type="button" (click)="toggleAsiento(11)" [class.bg-blue-600]="isAsientoSeleccionado(11)" [class.bg-red-500]="asientosOcupados.includes(11)" [class.bg-slate-800]="!isAsientoSeleccionado(11) && !asientosOcupados.includes(11)" class="w-8 h-8 rounded-lg border border-slate-700 text-[10px] font-bold transition-all flex items-center justify-center text-slate-300">11</button>
+                      </div>
+                      <div class="flex justify-center">
+                        <button type="button" (click)="toggleAsiento(12)" [class.bg-blue-600]="isAsientoSeleccionado(12)" [class.bg-red-500]="asientosOcupados.includes(12)" [class.bg-slate-800]="!isAsientoSeleccionado(12) && !asientosOcupados.includes(12)" class="w-8 h-8 rounded-lg border border-slate-700 text-[10px] font-bold transition-all flex items-center justify-center text-slate-300">12</button>
+                      </div>
+                      <div class="flex justify-center">
+                        <button type="button" (click)="toggleAsiento(13)" [class.bg-blue-600]="isAsientoSeleccionado(13)" [class.bg-red-500]="asientosOcupados.includes(13)" [class.bg-slate-800]="!isAsientoSeleccionado(13) && !asientosOcupados.includes(13)" class="w-8 h-8 rounded-lg border border-slate-700 text-[10px] font-bold transition-all flex items-center justify-center text-slate-300">13</button>
+                      </div>
+                      <div class="flex justify-center">
+                        <button type="button" (click)="toggleAsiento(14)" [class.bg-blue-600]="isAsientoSeleccionado(14)" [class.bg-red-500]="asientosOcupados.includes(14)" [class.bg-slate-800]="!isAsientoSeleccionado(14) && !asientosOcupados.includes(14)" class="w-8 h-8 rounded-lg border border-slate-700 text-[10px] font-bold transition-all flex items-center justify-center text-slate-300">14</button>
+                      </div>
+                      <div class="flex justify-center">
+                        <button type="button" (click)="toggleAsiento(15)" [class.bg-blue-600]="isAsientoSeleccionado(15)" [class.bg-red-500]="asientosOcupados.includes(15)" [class.bg-slate-800]="!isAsientoSeleccionado(15) && !asientosOcupados.includes(15)" class="w-8 h-8 rounded-lg border border-slate-700 text-[10px] font-bold transition-all flex items-center justify-center text-slate-300">15</button>
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+                
+                <!-- Leyenda de colores -->
+                <div class="flex items-center justify-center gap-4 mt-4 text-[10px] text-slate-400">
+                  <div class="flex items-center gap-1">
+                    <span class="w-2.5 h-2.5 rounded bg-slate-800 border border-slate-700"></span>
+                    <span>Libre</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="w-2.5 h-2.5 rounded bg-blue-600"></span>
+                    <span>Tu selección</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="w-2.5 h-2.5 rounded bg-red-500"></span>
+                    <span>Ocupado</span>
+                  </div>
+                </div>
+                
+                <!-- Mostrar selección actual -->
+                <div *ngIf="asientosSeleccionados.length > 0" class="text-center mt-3 text-xs bg-slate-950 p-2 rounded-xl border border-slate-800">
+                  <span class="text-slate-400 font-medium">Asientos elegidos:</span>
+                  <strong class="text-blue-400 ml-1.5">{{ asientosSeleccionados.join(', ') }}</strong>
+                </div>
+                
+              </div>
+            </div>
           </div>
 
           <div *ngIf="tipoViaje === 'encomienda'">
