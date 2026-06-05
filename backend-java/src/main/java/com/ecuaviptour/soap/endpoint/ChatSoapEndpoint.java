@@ -245,6 +245,7 @@ public class ChatSoapEndpoint {
         if (m.getSoporteAsignado() != null) {
             soap.setSoporteAsignadoId(m.getSoporteAsignado().getId());
             soap.setSoporteAsignadoNombre(m.getSoporteAsignado().getNombre());
+            soap.setSoporteAsignadoFotoUrl(m.getSoporteAsignado().getFotoPerfilUrl());
         }
         return soap;
     }

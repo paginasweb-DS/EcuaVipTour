@@ -105,7 +105,8 @@ export class ChatPanelComponent implements OnInit, OnChanges, OnDestroy, AfterVi
 
       const soporteAsignado = m.soporteAsignado || (m.soporte_asignado_id ? {
         id: Number(m.soporte_asignado_id),
-        nombre: m.soporte_asignado_nombre
+        nombre: m.soporte_asignado_nombre,
+        fotoPerfilUrl: m.soporte_asignado_foto_url || m.soporteAsignadoFotoUrl || ''
       } : null);
 
       return {
