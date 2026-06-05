@@ -16,6 +16,15 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.*;
 
+/**
+ * Implementación de la capa de servicios para la comunicación bidireccional y en tiempo real.
+ * Utiliza el servidor Socket.IO para gestionar salas de chat (grupales, de soporte y privadas),
+ * distribuir eventos de localización de conductores, difundir cambios de estados de viajes
+ * y notificar a los choferes sobre nuevos servicios disponibles en la plataforma.
+ *
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Service
 public class SocketIOServiceImpl implements SocketIOService {
 
@@ -25,6 +34,15 @@ public class SocketIOServiceImpl implements SocketIOService {
     private final UsuarioRepository usuarioRepository;
     private final VehiculoRepository vehiculoRepository;
 
+    /**
+     * Constructor para la inyección de dependencias de infraestructura en tiempo real y persistencia.
+     *
+     * @param server             Servidor de sockets SocketIOServer.
+     * @param chatService        Servicio para persistencia e inyección de mensajes de chat.
+     * @param viajeRepository    Repositorio de viajes.
+     * @param usuarioRepository  Repositorio de usuarios.
+     * @param vehiculoRepository Repositorio de vehículos.
+     */
     public SocketIOServiceImpl(SocketIOServer server, 
                                ChatService chatService, 
                                ViajeRepository viajeRepository, 
@@ -37,6 +55,11 @@ public class SocketIOServiceImpl implements SocketIOService {
         this.vehiculoRepository = vehiculoRepository;
     }
 
+    /**
+     * Inicializa y arranca de forma asíncrona el servidor Socket.IO tras la construcción del bean.
+     * Configura los listeners de conexión, desconexión y los manejadores de eventos como 'join',
+     * 'enviar_mensaje', 'aceptar_viaje', 'actualizar_ubicacion_chofer', 'llegada_origen' y 'finalizar_viaje'.
+     */
     @Override
     @PostConstruct
     public void startServer() {
@@ -320,6 +343,15 @@ public class SocketIOServiceImpl implements SocketIOService {
         }
     }
 
+    /**
+     * Difunde a las salas 'admins' y 'cliente_X' el evento de asignación de un agente de soporte técnico a un caso.
+     *
+     * @param clienteId      Identificador único del cliente.
+     * @param categoria      Categoría temática del ticket.
+     * @param soporteId      Identificador único del agente de soporte asignado.
+     * @param soporteNombre  Nombre completo del agente de soporte.
+     * @param soporteAvatar  URL de la fotografía del agente de soporte.
+     */
     @Override
     public void broadcastSupportAssign(Long clienteId, String categoria, Long soporteId, String soporteNombre, String soporteAvatar) {
         Map<String, Object> payload = new HashMap<>();
@@ -338,6 +370,11 @@ public class SocketIOServiceImpl implements SocketIOService {
         }
     }
 
+    /**
+     * Difunde en tiempo real a las salas 'admins' y 'cliente_X' la resolución y cierre de un ticket de soporte.
+     *
+     * @param clienteId Identificador único del cliente.
+     */
     @Override
     public void broadcastCaseResolve(Long clienteId) {
         Map<String, Object> payload = new HashMap<>();
@@ -353,6 +390,14 @@ public class SocketIOServiceImpl implements SocketIOService {
         }
     }
 
+    /**
+     * Notifica simultáneamente al cliente, al chofer y a los administradores sobre la cancelación de un viaje.
+     *
+     * @param viajeId   Identificador único del viaje cancelado.
+     * @param mensaje   Mensaje o motivo de la cancelación.
+     * @param clienteId Identificador único del cliente.
+     * @param choferId  Identificador único del chofer (si ya estaba asignado).
+     */
     @Override
     public void broadcastViajeCancelado(Long viajeId, String mensaje, Long clienteId, Long choferId) {
         Map<String, Object> payload = new HashMap<>();
@@ -376,6 +421,12 @@ public class SocketIOServiceImpl implements SocketIOService {
         }
     }
 
+    /**
+     * Envía una notificación masiva a la sala general de 'choferes' indicando que un nuevo viaje
+     * se encuentra disponible en la bolsa de trabajo para ser aceptado.
+     *
+     * @param v Objeto {@link Viaje} que ha sido publicado y está en busca de conductor.
+     */
     @Override
     public void broadcastNuevoViajeDisponible(Viaje v) {
         if (v == null) return;
@@ -411,6 +462,14 @@ public class SocketIOServiceImpl implements SocketIOService {
         }
     }
 
+    /**
+     * Difunde en tiempo real una actualización del estado financiero o logístico de un pago.
+     *
+     * @param viajeId         Identificador único del viaje.
+     * @param clienteId       Identificador del cliente.
+     * @param estadoPago      Nuevo estado del pago (por ejemplo: pagado, rechazado).
+     * @param estadoLogistico Nuevo estado logístico del viaje.
+     */
     @Override
     public void broadcastPagoActualizado(Long viajeId, Long clienteId, String estadoPago, String estadoLogistico) {
         Map<String, Object> payload = new HashMap<>();
@@ -429,6 +488,13 @@ public class SocketIOServiceImpl implements SocketIOService {
         }
     }
 
+    /**
+     * Notifica a la sala 'admins' y 'cliente_X' que se ha cargado un nuevo comprobante de pago
+     * para su posterior validación y revisión.
+     *
+     * @param viajeId   Identificador único del viaje.
+     * @param clienteId Identificador único del cliente.
+     */
     @Override
     public void broadcastNuevoComprobante(Long viajeId, Long clienteId) {
         try {
@@ -454,6 +520,9 @@ public class SocketIOServiceImpl implements SocketIOService {
         }
     }
 
+    /**
+     * Detiene de forma ordenada y limpia el servidor de sockets antes de la destrucción del bean.
+     */
     @Override
     @PreDestroy
     public void stopServer() {
@@ -463,3 +532,4 @@ public class SocketIOServiceImpl implements SocketIOService {
         }
     }
 }
+

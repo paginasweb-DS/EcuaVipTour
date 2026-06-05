@@ -5,49 +5,91 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Entidad de persistencia que representa un mensaje de chat dentro del sistema.
+ * Soporta la mensajería interna tanto para el chat operativo del viaje (entre cliente y chofer)
+ * como para los canales de soporte técnico y atención al cliente (entre cliente y agentes de soporte/admin).
+ * 
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Entity
 @Table(name = "mensajechat")
 public class MensajeChat {
 
+    /**
+     * Identificador único autoincremental del mensaje.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Relación ManyToOne opcional con el viaje. Se utiliza cuando el chat está vinculado
+     * al contexto operativo de un servicio en curso. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "viaje_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Viaje viaje;
 
+    /**
+     * Relación ManyToOne con el usuario remitente que redacta y envía el mensaje. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "remitente_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private Usuario remitente;
 
+    /**
+     * Relación ManyToOne con el usuario destinatario que recibe el mensaje. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "destinatario_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private Usuario destinatario;
 
+    /**
+     * Relación ManyToOne con el agente administrador asignado para responder casos de soporte. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "soporte_asignado_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private Usuario soporteAsignado;
 
+    /**
+     * Categoría temática del chat (ej. 'Consulta', 'Reclamo', 'Otro') utilizada para clasificar chats de soporte.
+     */
     @Column(name = "categoria", length = 50)
     private String categoria;
 
+    /**
+     * Estado del caso de soporte vinculado al mensaje (ej. 'abierto', 'resuelto').
+     */
     @Column(name = "estado", length = 20, nullable = false)
     private String estado = "abierto"; // 'abierto' o 'resuelto'
 
+    /**
+     * Indica el rol destinatario o canal de visualización del mensaje (ej. 'admin' o 'chofer').
+     */
     @Column(name = "tipo_receptor", length = 20, nullable = false)
     private String tipoReceptor = "admin"; // 'admin' o 'chofer'
 
+    /**
+     * Cuerpo textual del mensaje de chat.
+     */
     @Column(nullable = false, columnDefinition = "TEXT")
     private String contenido;
 
+    /**
+     * Bandera que indica si el mensaje ya fue leído por el receptor.
+     */
     @Column(nullable = false)
     private Boolean leido = false;
 
+    /**
+     * Fecha y marca temporal exacta de creación y envío del mensaje.
+     */
     @Column(nullable = false)
     private LocalDateTime timestamp = LocalDateTime.now();
 

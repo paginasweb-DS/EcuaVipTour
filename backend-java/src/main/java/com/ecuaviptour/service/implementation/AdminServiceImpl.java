@@ -15,6 +15,14 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Implementación de la capa de servicios para la administración del sistema.
+ * Proporciona lógica de negocio para gestionar el listado y estado de usuarios (clientes, choferes),
+ * calcular estadísticas operativas de choferes, y coordinar el estado de vehículos de la flota.
+ *
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Service
 public class AdminServiceImpl implements AdminService {
 
@@ -23,6 +31,14 @@ public class AdminServiceImpl implements AdminService {
     private final ViajeRepository viajeRepository;
     private final CalificacionRepository calificacionRepository;
 
+    /**
+     * Constructor para la inyección de dependencias de los repositorios requeridos.
+     *
+     * @param usuarioRepository      Repositorio de gestión de usuarios.
+     * @param vehiculoRepository     Repositorio de gestión de vehículos.
+     * @param viajeRepository        Repositorio de gestión de viajes.
+     * @param calificacionRepository Repositorio de valoraciones y calificaciones.
+     */
     public AdminServiceImpl(UsuarioRepository usuarioRepository,
                             VehiculoRepository vehiculoRepository,
                             ViajeRepository viajeRepository,
@@ -33,6 +49,18 @@ public class AdminServiceImpl implements AdminService {
         this.calificacionRepository = calificacionRepository;
     }
 
+    /**
+     * Recupera una lista filtrada y formateada de usuarios registrados.
+     * Si se solicita el rol de chofer y una fecha de viaje, descarta automáticamente aquellos choferes
+     * que cuenten con viajes en curso o planificados en la misma ventana de tiempo de la duración estimada.
+     *
+     * @param rol             Filtro opcional para el rol de usuario.
+     * @param search          Cadena de búsqueda para filtrar por nombre, correo, cédula o teléfono.
+     * @param activo          Filtro opcional por estado de activación del usuario.
+     * @param fechaViaje      Fecha y hora propuestas para comprobar disponibilidad horaria de choferes.
+     * @param duracionMinutos Duración en minutos estimada del viaje a programar.
+     * @return Lista de mapas conteniendo datos informativos y de rendimiento de los usuarios coincidentes.
+     */
     @Override
     public List<Map<String, Object>> getAllUsers(String rol, String search, Boolean activo, LocalDateTime fechaViaje, Integer duracionMinutos) {
         List<Usuario> users = usuarioRepository.findAll();
@@ -102,6 +130,13 @@ public class AdminServiceImpl implements AdminService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Alterna (habilita/deshabilita) el estado de activación de un usuario del sistema.
+     *
+     * @param usuarioId Identificador único del usuario.
+     * @return El {@link Usuario} con su estado modificado.
+     * @throws ResourceNotFoundException Si no existe un usuario con el ID provisto.
+     */
     @Override
     @Transactional
     public Usuario toggleUserStatus(Long usuarioId) {
@@ -112,6 +147,14 @@ public class AdminServiceImpl implements AdminService {
         return usuarioRepository.save(u);
     }
 
+    /**
+     * Actualiza los datos de perfil y permisos de un usuario desde la consola de administración.
+     *
+     * @param usuarioId Identificador único del usuario.
+     * @param data      Objeto que contiene los nuevos valores a actualizar en el perfil.
+     * @return El {@link Usuario} actualizado y persistido.
+     * @throws ResourceNotFoundException Si el usuario con el ID especificado no se encuentra registrado.
+     */
     @Override
     @Transactional
     public Usuario updateUserAdmin(Long usuarioId, Usuario data) {
@@ -128,6 +171,14 @@ public class AdminServiceImpl implements AdminService {
         return usuarioRepository.save(u);
     }
 
+    /**
+     * Obtiene y filtra la flota de vehículos según su estado de aprobación y una cadena de búsqueda
+     * (placa, marca o modelo).
+     *
+     * @param estado Estado de registro o aprobación del vehículo (por ejemplo: aprobado, pendiente).
+     * @param search Texto para buscar coincidencias parciales de placa, marca o modelo.
+     * @return Lista ordenada de {@link Vehiculo} que cumplen con las condiciones de filtro.
+     */
     @Override
     public List<Vehiculo> getVehiculosFiltrados(String estado, String search) {
         return vehiculoRepository.findAll().stream()
@@ -140,6 +191,16 @@ public class AdminServiceImpl implements AdminService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Cambia de manera transaccional el estado de aprobación de un vehículo de la plataforma.
+     * Si el nuevo estado es "activo", se actualiza también automáticamente el rol del usuario propietario
+     * asignándole permisos formales de "chofer".
+     *
+     * @param vehiculoId  Identificador único del vehículo.
+     * @param nuevoEstado Nuevo estado del vehículo a registrar.
+     * @return El {@link Vehiculo} actualizado.
+     * @throws ResourceNotFoundException Si el vehículo no se encuentra registrado en el sistema.
+     */
     @Override
     @Transactional
     public Vehiculo cambiarEstadoVehiculo(Long vehiculoId, String nuevoEstado) {
@@ -158,3 +219,4 @@ public class AdminServiceImpl implements AdminService {
         return vehiculoRepository.save(v);
     }
 }
+

@@ -12,6 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Planificador en segundo plano (Scheduler) para la limpieza y cancelación automática de viajes.
+ * Monitorea periódicamente las reservas activas y cancela transaccionalmente aquellos viajes
+ * cuyo plazo para subir el comprobante de pago haya expirado sin confirmación.
+ *
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Component
 public class ViajeCleanupScheduler {
 
@@ -19,6 +27,13 @@ public class ViajeCleanupScheduler {
     private final ReservaAsientoRepository reservaAsientoRepository;
     private final SocketIOService socketIOService;
 
+    /**
+     * Constructor para inyección de repositorios y servicios de sockets en tiempo real.
+     *
+     * @param viajeRepository          Repositorio de viajes.
+     * @param reservaAsientoRepository Repositorio de reservas de asientos.
+     * @param socketIOService          Servicio para emitir eventos de sockets en tiempo real.
+     */
     public ViajeCleanupScheduler(ViajeRepository viajeRepository,
                                  ReservaAsientoRepository reservaAsientoRepository,
                                  SocketIOService socketIOService) {
@@ -27,6 +42,13 @@ public class ViajeCleanupScheduler {
         this.socketIOService = socketIOService;
     }
 
+    /**
+     * Tarea programada ejecutada con un retardo fijo de 10 segundos.
+     * Busca los viajes pendientes de pago o rechazados que superen la fecha límite de pago,
+     * cambia su estado logístico a "cancelado", libera el chofer y el vehículo asignado,
+     * marca los asientos reservados correspondientes como "cancelados", y difunde el aviso de cancelación
+     * por Socket.IO en tiempo real a los clientes y conductores afectados.
+     */
     @Scheduled(fixedDelay = 10000) // Every 10 seconds
     @Transactional
     public void cleanupExpiredTrips() {
@@ -60,3 +82,4 @@ public class ViajeCleanupScheduler {
         }
     }
 }
+

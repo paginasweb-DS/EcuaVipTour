@@ -19,6 +19,15 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Implementación de la capa de servicios para la gestión de solicitudes, reservas y logística de viajes.
+ * Centraliza la lógica de cotización automatizada de tarifas, la asignación física o aleatoria de asientos,
+ * el control estricto de colisión de horarios y superposiciones para conductores,
+ * y la persistencia de itinerarios.
+ *
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Service
 public class ViajeServiceImpl implements ViajeService {
 
@@ -27,6 +36,14 @@ public class ViajeServiceImpl implements ViajeService {
     private final VehiculoRepository vehiculoRepository;
     private final ReservaAsientoRepository reservaAsientoRepository;
 
+    /**
+     * Constructor para la inyección de repositorios clave del negocio de viajes.
+     *
+     * @param viajeRepository          Repositorio de viajes.
+     * @param usuarioRepository      Repositorio de usuarios.
+     * @param vehiculoRepository     Repositorio de vehículos.
+     * @param reservaAsientoRepository Repositorio de asignación de asientos.
+     */
     public ViajeServiceImpl(ViajeRepository viajeRepository,
                             UsuarioRepository usuarioRepository,
                             VehiculoRepository vehiculoRepository,
@@ -37,26 +54,58 @@ public class ViajeServiceImpl implements ViajeService {
         this.reservaAsientoRepository = reservaAsientoRepository;
     }
 
+    /**
+     * Obtiene todos los viajes almacenados en el sistema sin un ordenamiento particular.
+     *
+     * @return Lista de todos los {@link Viaje}.
+     */
     @Override
     public List<Viaje> listar() {
         return viajeRepository.findAll();
     }
 
+    /**
+     * Obtiene la información detallada de un viaje a través de su identificador único.
+     *
+     * @param id Identificador único del viaje.
+     * @return El {@link Viaje} correspondiente, o null si no se encuentra registrado.
+     */
     @Override
     public Viaje obtener(Long id) {
         return viajeRepository.findById(id).orElse(null);
     }
 
+    /**
+     * Guarda o actualiza un registro de viaje en la base de datos.
+     *
+     * @param entity Viaje a persistir.
+     * @return El {@link Viaje} persistido.
+     */
     @Override
     public Viaje guardar(Viaje entity) {
         return viajeRepository.save(entity);
     }
 
+    /**
+     * Elimina un viaje de la base de datos según su identificador único.
+     *
+     * @param id Identificador único del viaje a eliminar.
+     */
     @Override
     public void eliminar(Long id) {
         viajeRepository.deleteById(id);
     }
 
+    /**
+     * Genera una cotización en tiempo real basada en la distancia en kilómetros, el tipo de servicio y pasajeros.
+     * Soporta modalidades como express (costo por kilómetro), encomienda (tarifa plana de envío) y pasaje compartido (por asiento).
+     *
+     * @param distanciaKm  Distancia estimada en kilómetros.
+     * @param tipoServicio Tipo de servicio solicitado ('express', 'encomienda', 'pasajero').
+     * @param numPasajeros Cantidad de pasajeros para la cotización de asientos.
+     * @return Un mapa conteniendo el precio total calculado, la distancia, modalidad y zona de clasificación.
+     * @throws BadRequestException Si la distancia es nula o menor/igual a cero.
+     */
     @Override
     public Map<String, Object> cotizar(BigDecimal distanciaKm, String tipoServicio, Integer numPasajeros) {
         if (distanciaKm == null || distanciaKm.compareTo(BigDecimal.ZERO) <= 0) {
@@ -93,6 +142,26 @@ public class ViajeServiceImpl implements ViajeService {
         return result;
     }
 
+    /**
+     * Procesa y registra transaccionalmente una reserva formal de viaje y sus respectivos asientos.
+     * Implementa flujos clave de negocio:
+     * - Carga y valida el cliente de la reserva.
+     * - Si se asigna conductor, asocia su vehículo y calcula asientos libres en base a otros viajes compartidos del conductor a la misma fecha y hora.
+     * - Reserva físicamente los asientos provistos (validando capacidad y colisiones), o auto-asigna de forma secuencial los primeros disponibles si no se especifican.
+     * - Verifica conflictos de itinerarios para el chofer: valida superposiciones horarias con un margen de duración estimada, bloqueando reservas con cruces excepto si son viajes compartidos en idéntica ventana.
+     * - Define la fecha límite de pago (15 minutos de tolerancia para subir comprobante).
+     *
+     * @param viaje        Datos base del viaje.
+     * @param asientosReq  Lista de números de asientos solicitados manualmente.
+     * @param clienteId    Identificador del cliente solicitante.
+     * @param choferId     Identificador único del chofer (puede ser nulo si se requiere asignación posterior).
+     * @param numPasajeros Cantidad de pasajeros (asientos) a reservar.
+     * @param tarifa       Tarifa unitaria aplicada por asiento.
+     * @return El {@link Viaje} guardado con sus relaciones establecidas.
+     * @throws ResourceNotFoundException Si el cliente o chofer especificados no existen.
+     * @throws BadRequestException       Si el número de asiento solicitado no pertenece a la capacidad del vehículo.
+     * @throws ConflictException         Si un asiento solicitado ya está ocupado, o el chofer presenta colisión horaria.
+     */
     @Override
     @Transactional
     public Viaje reservar(Viaje viaje, List<Integer> asientosReq, Long clienteId, Long choferId, Integer numPasajeros, BigDecimal tarifa) {
@@ -233,31 +302,66 @@ public class ViajeServiceImpl implements ViajeService {
         return savedViaje;
     }
 
+    /**
+     * Obtiene el listado de viajes solicitados por un cliente.
+     *
+     * @param clienteId Identificador único del cliente.
+     * @return Lista de {@link Viaje} ordenados cronológicamente de forma descendente.
+     */
     @Override
     public List<Viaje> getViajesCliente(Long clienteId) {
         return viajeRepository.findByClienteIdOrderByIdDesc(clienteId);
     }
 
+    /**
+     * Obtiene el listado de viajes asignados a un chofer.
+     *
+     * @param choferId Identificador único del chofer.
+     * @return Lista de {@link Viaje} asignados al chofer.
+     */
     @Override
     public List<Viaje> getViajesChofer(Long choferId) {
         return viajeRepository.findByChoferIdOrderByIdDesc(choferId);
     }
 
+    /**
+     * Recupera todos los viajes pendientes de conductor (estado logístico 'buscando_chofer').
+     *
+     * @return Lista de {@link Viaje} que están disponibles para la postulación de choferes.
+     */
     @Override
     public List<Viaje> getViajesPendientesChofer() {
         return viajeRepository.findByEstadoLogisticoOrderByIdDesc("buscando_chofer");
     }
 
+    /**
+     * Obtiene todos los viajes registrados en el sistema del más reciente al más antiguo.
+     *
+     * @return Lista completa de {@link Viaje} registrados.
+     */
     @Override
     public List<Viaje> getAllViajes() {
         return viajeRepository.findAllByOrderByIdDesc();
     }
 
+    /**
+     * Recupera la información de un viaje específico.
+     *
+     * @param id Identificador único del viaje.
+     * @return Un {@link Optional} que contiene el viaje si existe.
+     */
     @Override
     public Optional<Viaje> getViajeById(Long id) {
         return viajeRepository.findById(id);
     }
 
+    /**
+     * Consulta el listado de asientos ocupados (reservas confirmadas o pendientes, excluyendo canceladas)
+     * para un viaje específico.
+     *
+     * @param viajeId Identificador único del viaje.
+     * @return Lista de números de asientos ocupados.
+     */
     @Override
     public List<Integer> getAsientosOcupados(Long viajeId) {
         return reservaAsientoRepository.findByViajeId(viajeId).stream()
@@ -266,6 +370,14 @@ public class ViajeServiceImpl implements ViajeService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene el viaje actualmente activo de un usuario (sea cliente o chofer).
+     * Se considera activo si está en estado 'aceptado', 'esperando_cliente' o 'en_curso' para choferes,
+     * o 'asignado', 'en_curso' o 'confirmado' para clientes.
+     *
+     * @param userId Identificador único del usuario.
+     * @return Un {@link Optional} con el viaje activo si existe.
+     */
     @Override
     public Optional<Viaje> getViajeActivo(Long userId) {
         Usuario user = usuarioRepository.findById(userId).orElse(null);
@@ -279,3 +391,4 @@ public class ViajeServiceImpl implements ViajeService {
                 .findFirst();
     }
 }
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://ecuaviptour.com/soap/pagos"
+           xmlns:tns="http://ecuaviptour.com/soap/pagos"
+           elementFormDefault="qualified">
+
+    <xs:element name="subirComprobanteRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="viaje_id" type="xs:long"/>
+                <xs:element name="file_base64" type="xs:string"/>
+                <xs:element name="filename" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="subirComprobanteResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="pago_id" type="xs:long"/>
+                <xs:element name="comprobante_url" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

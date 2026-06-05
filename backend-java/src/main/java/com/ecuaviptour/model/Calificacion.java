@@ -5,29 +5,54 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Entidad de persistencia que representa la calificación otorgada por un cliente al finalizar un viaje.
+ * Almacena el nivel de satisfacción en estrellas, comentarios cualitativos y metadatos de auditoría.
+ * 
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Entity
 @Table(name = "calificacion")
 public class Calificacion {
 
+    /**
+     * Identificador único autoincremental de la calificación.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Relación ManyToOne con el viaje evaluado. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "viaje_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Viaje viaje;
 
+    /**
+     * Relación ManyToOne con el usuario (cliente) que realiza la calificación. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private Usuario cliente;
 
+    /**
+     * Número de estrellas otorgadas como calificación del servicio (generalmente entre 1 y 5).
+     */
     private Integer estrellas;
 
+    /**
+     * Comentario o retroalimentación escrita del cliente sobre el viaje.
+     */
     @Column(columnDefinition = "TEXT")
     private String comentario;
 
+    /**
+     * Fecha y hora en la que se registró la calificación en el sistema.
+     */
     @Column(name = "fecha_calificacion", nullable = false)
     private LocalDateTime fechaCalificacion = LocalDateTime.now();
 

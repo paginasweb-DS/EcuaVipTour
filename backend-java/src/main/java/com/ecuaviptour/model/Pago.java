@@ -6,25 +6,48 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Entidad de persistencia que representa un registro de pago dentro del sistema.
+ * Guarda la referencia al archivo de comprobante de transferencia bancaria,
+ * el monto pagado y la fecha de subida del mismo para la posterior validación del administrador.
+ * 
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Entity
 @Table(name = "pago")
 public class Pago {
 
+    /**
+     * Identificador único autoincremental del registro de pago.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Relación ManyToOne con el viaje correspondiente al pago. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "viaje_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Viaje viaje;
 
+    /**
+     * Ruta o URL relativa de almacenamiento del archivo del comprobante de pago subido al servidor.
+     */
     @Column(name = "comprobante_url", columnDefinition = "TEXT")
     private String comprobanteUrl;
 
+    /**
+     * Monto económico verificado y pagado por el viaje.
+     */
     @Column(name = "monto_pagado", precision = 10, scale = 2)
     private BigDecimal montoPagado;
 
+    /**
+     * Fecha y hora en la que se registró el pago en el sistema.
+     */
     @Column(name = "fecha_pago", nullable = false)
     private LocalDateTime fechaPago = LocalDateTime.now();
 

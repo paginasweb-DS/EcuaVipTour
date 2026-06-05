@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://ecuaviptour.com/soap/auth"
+           xmlns:tns="http://ecuaviptour.com/soap/auth"
+           elementFormDefault="qualified">
+
+    <xs:complexType name="usuarioSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="nombre" type="xs:string"/>
+            <xs:element name="correo" type="xs:string"/>
+            <xs:element name="telefono" type="xs:string" minOccurs="0"/>
+            <xs:element name="cedula" type="xs:string" minOccurs="0"/>
+            <xs:element name="fotoPerfilUrl" type="xs:string" minOccurs="0"/>
+            <xs:element name="rol" type="xs:string"/>
+            <xs:element name="activo" type="xs:boolean"/>
+            <xs:element name="fechaRegistro" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Login -->
+    <xs:element name="loginRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="correo" type="xs:string"/>
+                <xs:element name="password" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="loginResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="token" type="xs:string"/>
+                <xs:element name="mensaje" type="xs:string"/>
+                <xs:element name="usuario" type="tns:usuarioSoapType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Register -->
+    <xs:element name="registerRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="nombre" type="xs:string"/>
+                <xs:element name="correo" type="xs:string"/>
+                <xs:element name="password" type="xs:string"/>
+                <xs:element name="telefono" type="xs:string" minOccurs="0"/>
+                <xs:element name="cedula" type="xs:string" minOccurs="0"/>
+                <xs:element name="rol" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="registerResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="token" type="xs:string"/>
+                <xs:element name="mensaje" type="xs:string"/>
+                <xs:element name="usuario" type="tns:usuarioSoapType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Update Profile -->
+    <xs:element name="updateProfileRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="nombre" type="xs:string" minOccurs="0"/>
+                <xs:element name="telefono" type="xs:string" minOccurs="0"/>
+                <xs:element name="fotoPerfilUrl" type="xs:string" minOccurs="0"/>
+                <xs:element name="cedula" type="xs:string" minOccurs="0"/>
+                <xs:element name="password" type="xs:string" minOccurs="0"/>
+                <xs:element name="correo" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="updateProfileResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="mensaje" type="xs:string"/>
+                <xs:element name="usuario" type="tns:usuarioSoapType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Upload Avatar -->
+    <xs:element name="uploadAvatarRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="fotoBase64" type="xs:string"/>
+                <xs:element name="filename" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="uploadAvatarResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="mensaje" type="xs:string"/>
+                <xs:element name="fotoPerfilUrl" type="xs:string"/>
+                <xs:element name="usuario" type="tns:usuarioSoapType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

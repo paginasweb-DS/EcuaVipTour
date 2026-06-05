@@ -15,6 +15,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación de los servicios para gestionar las valoraciones y calificaciones del sistema.
+ * Proporciona lógica de negocio para registrar, consultar y validar reseñas y puntajes en estrellas
+ * otorgados por los clientes hacia los viajes realizados.
+ *
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Service
 public class CalificacionServiceImpl implements CalificacionService {
 
@@ -22,6 +30,13 @@ public class CalificacionServiceImpl implements CalificacionService {
     private final ViajeRepository viajeRepository;
     private final UsuarioRepository usuarioRepository;
 
+    /**
+     * Constructor para inyectar los repositorios requeridos de calificaciones, viajes y usuarios.
+     *
+     * @param calificacionRepository Repositorio de calificaciones.
+     * @param viajeRepository        Repositorio de viajes.
+     * @param usuarioRepository      Repositorio de usuarios.
+     */
     public CalificacionServiceImpl(CalificacionRepository calificacionRepository,
                                    ViajeRepository viajeRepository,
                                    UsuarioRepository usuarioRepository) {
@@ -30,26 +45,60 @@ public class CalificacionServiceImpl implements CalificacionService {
         this.usuarioRepository = usuarioRepository;
     }
 
+    /**
+     * Obtiene el listado completo de calificaciones de la base de datos.
+     *
+     * @return Lista de todas las {@link Calificacion} registradas.
+     */
     @Override
     public List<Calificacion> listar() {
         return calificacionRepository.findAll();
     }
 
+    /**
+     * Obtiene una calificación específica a través de su identificador único.
+     *
+     * @param id Identificador único de la calificación.
+     * @return Objeto {@link Calificacion} correspondiente, o null si no se encuentra registrado.
+     */
     @Override
     public Calificacion obtener(Long id) {
         return calificacionRepository.findById(id).orElse(null);
     }
 
+    /**
+     * Guarda o actualiza una calificación directamente en base de datos.
+     *
+     * @param entity Calificación a persistir.
+     * @return La {@link Calificacion} persistida.
+     */
     @Override
     public Calificacion guardar(Calificacion entity) {
         return calificacionRepository.save(entity);
     }
 
+    /**
+     * Elimina una calificación de la base de datos según su identificador único.
+     *
+     * @param id Identificador único de la calificación a eliminar.
+     */
     @Override
     public void eliminar(Long id) {
         calificacionRepository.deleteById(id);
     }
 
+    /**
+     * Registra de forma transaccional una nueva valoración (calificación en estrellas y comentario)
+     * por parte de un cliente para un viaje específico, comprobando que no exista una valoración previa.
+     *
+     * @param viajeId    Identificador único del viaje realizado.
+     * @param clienteId  Identificador único del cliente que califica.
+     * @param estrellas  Puntaje otorgado (típicamente de 1 a 5).
+     * @param comentario Opinión o reseña en texto sobre la experiencia del viaje.
+     * @return La nueva {@link Calificacion} registrada.
+     * @throws ResourceNotFoundException Si el viaje o el cliente especificado no existen.
+     * @throws ConflictException         Si el cliente ya ha calificado previamente este mismo viaje.
+     */
     @Override
     @Transactional
     public Calificacion calificar(Long viajeId, Long clienteId, Integer estrellas, String comentario) {
@@ -76,13 +125,27 @@ public class CalificacionServiceImpl implements CalificacionService {
         return calificacionRepository.save(c);
     }
 
+    /**
+     * Recupera las calificaciones registradas para un viaje específico.
+     *
+     * @param viajeId Identificador único del viaje.
+     * @return Lista de {@link Calificacion} asociadas al viaje.
+     */
     @Override
     public List<Calificacion> getCalificacionesByViaje(Long viajeId) {
         return calificacionRepository.findByViajeId(viajeId);
     }
 
+    /**
+     * Busca la calificación de un viaje que haya sido realizada por un cliente en específico.
+     *
+     * @param viajeId   Identificador único del viaje.
+     * @param clienteId Identificador único del cliente.
+     * @return Un {@link Optional} que contiene la calificación si está registrada.
+     */
     @Override
     public Optional<Calificacion> getCalificacionPorViajeYCliente(Long viajeId, Long clienteId) {
         return calificacionRepository.findByViajeIdAndClienteId(viajeId, clienteId);
     }
 }
+

@@ -5,30 +5,56 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Entidad de persistencia que representa la reserva de un asiento específico dentro de un viaje.
+ * Mapea la distribución de pasajeros contratados por servicio, gestionando el número de asiento,
+ * la relación de pertenencia de cliente/viaje y el estado operativo de la reserva.
+ * 
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Entity
 @Table(name = "reserva_asiento")
 public class ReservaAsiento {
 
+    /**
+     * Identificador único autoincremental de la reserva de asiento.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Relación ManyToOne con el viaje correspondiente a la reserva de asiento. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "viaje_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Viaje viaje;
 
+    /**
+     * Relación ManyToOne con el cliente (pasajero) que realiza la reserva. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private Usuario cliente;
 
+    /**
+     * Número específico de asiento reservado en el vehículo asignado al viaje.
+     */
     @Column(name = "numero_asiento", nullable = false)
     private Integer numeroAsiento;
 
+    /**
+     * Fecha y marca temporal en la que se creó la reserva del asiento.
+     */
     @Column(name = "fecha_reserva", nullable = false)
     private LocalDateTime fechaReserva = LocalDateTime.now();
 
+    /**
+     * Estado logístico y financiero de la reserva (ej. 'pendiente', 'confirmado', 'cancelado').
+     */
     @Column(length = 20, nullable = false)
     private String estado = "pendiente"; // 'pendiente', 'confirmado', 'cancelado'
 

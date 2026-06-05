@@ -6,80 +6,154 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Entidad de persistencia principal que representa un viaje dentro de la plataforma EcuavipTour.
+ * Almacena los puntos geográficos de origen y destino, montos financieros,
+ * estados de pago y logística, vinculando al cliente solicitante, el chofer asignado y el vehículo.
+ * 
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Entity
 @Table(name = "viaje")
 public class Viaje {
 
+    /**
+     * Identificador único autoincremental del viaje.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Relación ManyToOne con el usuario cliente que solicita el viaje. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private Usuario cliente;
 
+    /**
+     * Relación ManyToOne con el usuario chofer que realiza el traslado. Carga opcional diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chofer_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})
     private Usuario chofer;
 
+    /**
+     * Relación ManyToOne con el vehículo asignado al viaje. Carga opcional diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehiculo_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "chofer"})
     private Vehiculo vehiculo;
 
+    /**
+     * Dirección textual descriptiva del punto de origen.
+     */
     @Column(name = "dir_origen", nullable = false, columnDefinition = "TEXT")
     private String dirOrigen;
 
+    /**
+     * Latitud geográfica del punto de origen.
+     */
     @Column(name = "lat_origen", precision = 10, scale = 8)
     private BigDecimal latOrigen;
 
+    /**
+     * Longitud geográfica del punto de origen.
+     */
     @Column(name = "lng_origen", precision = 11, scale = 8)
     private BigDecimal lngOrigen;
 
+    /**
+     * Dirección textual descriptiva del punto de destino.
+     */
     @Column(name = "dir_destino", nullable = false, columnDefinition = "TEXT")
     private String dirDestino;
 
+    /**
+     * Latitud geográfica del punto de destino.
+     */
     @Column(name = "lat_destino", precision = 10, scale = 8)
     private BigDecimal latDestino;
 
+    /**
+     * Longitud geográfica del punto de destino.
+     */
     @Column(name = "lng_destino", precision = 11, scale = 8)
     private BigDecimal lngDestino;
 
+    /**
+     * Referencias o indicaciones adicionales proporcionadas por el cliente.
+     */
     @Column(name = "referencia_adicional", columnDefinition = "TEXT")
     private String referenciaAdicional;
 
+    /**
+     * Distancia calculada del trayecto en kilómetros.
+     */
     @Column(name = "distancia_km", precision = 10, scale = 2)
     private BigDecimal distanciaKm;
 
+    /**
+     * Precio o tarifa económica total asignada al viaje.
+     */
     @Column(name = "monto_total", precision = 10, scale = 2)
     private BigDecimal montoTotal;
 
+    /**
+     * Tipo de servicio (ej. 'pasajero', 'encomienda', 'express').
+     */
     @Column(name = "tipo_servicio", length = 20)
     private String tipoServicio; // pasajero, encomienda, express
 
+    /**
+     * Modalidad de traslado contratada (ej. 'compartido', 'privado_express').
+     */
     @Column(name = "tipo_modalidad", length = 20)
     private String tipoModalidad; // compartido, privado_express
 
+    /**
+     * Estado financiero de la transacción (ej. 'pendiente', 'comprobante_subido', 'aprobado', 'rechazado').
+     */
     @Column(name = "estado_pago", length = 20, nullable = false)
     private String estadoPago = "pendiente";
 
+    /**
+     * Estado logístico y de ejecución del servicio (ej. 'pendiente', 'buscando_chofer', 'aceptado', 'recogiendo', 'en_curso', 'finalizado', 'cancelado').
+     */
     @Column(name = "estado_logistico", length = 20, nullable = false)
     private String estadoLogistico = "pendiente";
 
+    /**
+     * Límite de tiempo disponible para subir el comprobante de pago antes de cancelar el viaje de forma automática (15 minutos).
+     */
     @Column(name = "fecha_limite_pago")
     private LocalDateTime fechaLimitePago;
 
+    /**
+     * Justificación registrada por el administrador en caso de rechazo del comprobante de pago.
+     */
     @Column(name = "comentario_rechazo", columnDefinition = "TEXT")
     private String comentarioRechazo;
 
+    /**
+     * Fecha y marca temporal de creación de la solicitud del viaje.
+     */
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
+    /**
+     * Fecha y hora programada para el inicio del viaje.
+     */
     @Column(name = "fecha_viaje")
     private LocalDateTime fechaViaje;
 
+    /**
+     * Duración aproximada estimada del trayecto expresada en minutos.
+     */
     @Column(name = "duracion_minutos", nullable = false)
     private Integer duracionMinutos = 30;
 

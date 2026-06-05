@@ -1,37 +1,40 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, Subject } from 'rxjs';
+import { SoapService } from './soap.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://127.0.0.1:5001/api/auth';
+  private namespace = 'http://ecuaviptour.com/soap/auth';
   private isBrowser: boolean;
   
-  // Subject para abrir el modal desde cualquier lugar
   private authModalSubject = new Subject<void>();
   authModal$ = this.authModalSubject.asObservable();
 
   constructor(
     @Inject(PLATFORM_ID) platformId: Object,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private soapService: SoapService
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 
   login(credentials: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
+    return this.soapService.post(this.namespace, 'loginRequest', {
+      correo: credentials.correo,
+      password: credentials.password
+    }).pipe(
       tap((res: any) => {
         if (res.token) {
           this.setToken(res.token);
           if (this.isBrowser) {
             localStorage.setItem('ecuavip_user', JSON.stringify(res.usuario));
           }
-          // Redirigir según el rol del usuario
           this.redirectByRole(res.usuario?.rol);
         }
       })
@@ -39,29 +42,40 @@ export class AuthService {
   }
 
   register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData).pipe(
+    return this.soapService.post(this.namespace, 'registerRequest', {
+      nombre: userData.nombre,
+      correo: userData.correo,
+      password: userData.password,
+      telefono: userData.telefono,
+      cedula: userData.cedula,
+      rol: userData.rol
+    }).pipe(
       tap((res: any) => {
         if (res.token) {
           this.setToken(res.token);
           if (this.isBrowser) {
             localStorage.setItem('ecuavip_user', JSON.stringify(res.usuario));
           }
-          // Redirigir según el rol del usuario
           this.redirectByRole(res.usuario?.rol);
         }
       })
     );
   }
 
-  private getHeaders() {
-    const token = this.getToken();
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  }
-
   updateProfile(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/update-profile`, userData, { headers: this.getHeaders() }).pipe(
+    return this.soapService.post(
+      this.namespace,
+      'updateProfileRequest',
+      {
+        nombre: userData.nombre,
+        telefono: userData.telefono,
+        fotoPerfilUrl: userData.foto_perfil_url,
+        cedula: userData.cedula,
+        password: userData.password,
+        correo: userData.correo
+      },
+      this.getToken() || undefined
+    ).pipe(
       tap((res: any) => {
         if (res.usuario && this.isBrowser) {
           localStorage.setItem('ecuavip_user', JSON.stringify(res.usuario));
@@ -71,15 +85,29 @@ export class AuthService {
   }
 
   uploadAvatar(file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('foto', file);
-    return this.http.post(`${this.apiUrl}/upload-avatar`, formData, { headers: this.getHeaders() }).pipe(
-      tap((res: any) => {
-        if (res.usuario && this.isBrowser) {
-          localStorage.setItem('ecuavip_user', JSON.stringify(res.usuario));
-        }
-      })
-    );
+    return new Observable(observer => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64Data = reader.result as string;
+        this.soapService.post(
+          this.namespace,
+          'uploadAvatarRequest',
+          { fotoBase64: base64Data, filename: file.name },
+          this.getToken() || undefined
+        ).subscribe({
+          next: (res) => {
+            if (res.usuario && this.isBrowser) {
+              localStorage.setItem('ecuavip_user', JSON.stringify(res.usuario));
+            }
+            observer.next(res);
+            observer.complete();
+          },
+          error: (err) => observer.error(err)
+        });
+      };
+      reader.onerror = (error) => observer.error(error);
+    });
   }
 
   redirectByRole(rol: string): void {

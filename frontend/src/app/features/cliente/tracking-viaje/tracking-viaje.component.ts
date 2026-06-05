@@ -110,7 +110,7 @@ export class TrackingViajeComponent implements OnInit, OnDestroy {
     // Escuchar actualizaciones de estado (por ejemplo, admin aprueba/rechaza)
     this.socketSub = this.socketService.listen('pago_actualizado').subscribe((data) => {
       console.log('Pago actualizado en tiempo real!', data);
-      if (this.viajeActual && data.viaje_id === this.viajeActual.viaje_id) {
+      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id || this.viajeActual.id)) {
         this.cargarViajes();
       }
     });
@@ -125,7 +125,7 @@ export class TrackingViajeComponent implements OnInit, OnDestroy {
     // Escuchar si se asigna un chofer en tiempo real
     this.assignmentSub = this.socketService.listen('chofer_asignado').subscribe((data: any) => {
       console.log('Chofer asignado en tiempo real!', data);
-      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id)) {
+      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id || this.viajeActual.id)) {
         this.viajeActual.chofer_id = data.chofer_id;
         this.viajeActual.nombre_chofer = data.nombre_chofer;
         this.viajeActual.estado_logistico = data.estado;
@@ -139,7 +139,7 @@ export class TrackingViajeComponent implements OnInit, OnDestroy {
     // Escuchar cuando el chofer llega al punto
     this.socketService.listen('chofer_en_punto').subscribe((data: any) => {
       console.log('Chofer en punto!', data);
-      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id)) {
+      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id || this.viajeActual.id)) {
         this.viajeActual.estado_logistico = 'esperando_cliente';
         this.showToast('¡Tu chofer ha llegado al punto de inicio!');
         if (this.directionsRenderer) this.calculateRoute();
@@ -149,7 +149,7 @@ export class TrackingViajeComponent implements OnInit, OnDestroy {
     // Escuchar cuando el viaje finaliza
     this.socketService.listen('viaje_finalizado').subscribe((data: any) => {
       console.log('Viaje finalizado!', data);
-      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id)) {
+      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id || this.viajeActual.id)) {
         this.viajeActual.estado_logistico = 'finalizado';
         this.showToast('Tu viaje ha finalizado. ¡Gracias por usar Ecuavip Tour!');
         this.showRatingModal = true; // ACTIVAR BURBUJA DE CALIFICACIÓN
@@ -160,7 +160,7 @@ export class TrackingViajeComponent implements OnInit, OnDestroy {
     // Escuchar cuando el viaje es cancelado
     this.socketService.listen('viaje_cancelado').subscribe((data: any) => {
       console.log('Viaje cancelado!', data);
-      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id)) {
+      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id || this.viajeActual.id)) {
         this.viajeActual.estado_logistico = 'cancelado';
         this.showToast(data.mensaje);
         setTimeout(() => this.cargarViajes(), 3000); // Dar tiempo a ver el toast
@@ -170,7 +170,7 @@ export class TrackingViajeComponent implements OnInit, OnDestroy {
     // Escuchar cuando el chofer cancela el viaje y vuelve a buscar chofer
     this.socketService.listen('buscando_nuevo_chofer').subscribe((data: any) => {
       console.log('Chofer canceló el viaje, buscando nuevo conductor...', data);
-      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id)) {
+      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id || this.viajeActual.id)) {
         this.viajeActual.chofer_id = null;
         this.viajeActual.nombre_chofer = null;
         this.viajeActual.estado_logistico = 'buscando_chofer';
@@ -185,7 +185,7 @@ export class TrackingViajeComponent implements OnInit, OnDestroy {
 
     // Escuchar cualquier actualización de estado genérica
     this.socketService.listen('viaje_actualizado_cliente').subscribe((data: any) => {
-      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id)) {
+      if (this.viajeActual && Number(data.viaje_id) === Number(this.viajeActual.viaje_id || this.viajeActual.id)) {
         this.viajeActual.estado_logistico = data.estado;
       }
     });

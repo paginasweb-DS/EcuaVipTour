@@ -4,38 +4,76 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Entidad de persistencia que representa un usuario dentro del sistema EcuavipTour.
+ * Gestiona la información de identificación (cédula, correo, teléfono), datos de seguridad (passwordHash),
+ * roles del sistema (cliente, chofer, admin) y estado de activación en el sistema.
+ * 
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Entity
 @Table(name = "usuario")
 public class Usuario {
 
+    /**
+     * Identificador único autoincremental del usuario en la base de datos.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Nombre completo del usuario.
+     */
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    /**
+     * Dirección de correo electrónico única para el inicio de sesión y contacto.
+     */
     @Column(nullable = false, unique = true, length = 100)
     private String correo;
 
+    /**
+     * Contraseña del usuario almacenada en formato hash seguro (BCrypt/scrypt).
+     */
     @Column(name = "password_hash", nullable = false, columnDefinition = "TEXT")
     private String passwordHash;
 
+    /**
+     * Número telefónico de contacto del usuario.
+     */
     @Column(length = 20)
     private String telefono;
 
+    /**
+     * Cédula de identidad ecuatoriana única del usuario.
+     */
     @Column(unique = true, length = 15)
     private String cedula;
 
+    /**
+     * Ruta o URL relativa a la foto de perfil almacenada en el disco del servidor.
+     */
     @Column(name = "foto_perfil_url", columnDefinition = "TEXT")
     private String fotoPerfilUrl;
 
+    /**
+     * Rol asignado dentro de la aplicación para control de acceso (ej. 'admin', 'chofer', 'cliente').
+     */
     @Column(length = 20)
     private String rol; // admin, chofer, cliente
 
+    /**
+     * Define si el usuario se encuentra habilitado para ingresar y realizar acciones en el sistema.
+     */
     @Column(nullable = false)
     private Boolean activo = true;
 
+    /**
+     * Marca temporal correspondiente al momento de registro del usuario.
+     */
     @Column(name = "fecha_registro", nullable = false)
     private LocalDateTime fechaRegistro = LocalDateTime.now();
 

@@ -15,6 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Implementación de los servicios para gestionar la mensajería del chat y soporte.
+ * Implementa lógica de colisiones de asignación de soporte, apertura automática de tickets,
+ * asignaciones de agentes en tiempo real y lectura masiva de mensajes.
+ *
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Service
 public class ChatServiceImpl implements ChatService {
 
@@ -22,12 +30,33 @@ public class ChatServiceImpl implements ChatService {
     private final ViajeRepository viajeRepository;
     private final UsuarioRepository usuarioRepository;
 
+    /**
+     * Constructor para la inyección de repositorios encargados de la persistencia de mensajería y cuentas.
+     *
+     * @param mensajeRepository Repositorio de mensajes de chat.
+     * @param viajeRepository   Repositorio de viajes.
+     * @param usuarioRepository Repositorio de usuarios.
+     */
     public ChatServiceImpl(MensajeRepository mensajeRepository, ViajeRepository viajeRepository, UsuarioRepository usuarioRepository) {
         this.mensajeRepository = mensajeRepository;
         this.viajeRepository = viajeRepository;
         this.usuarioRepository = usuarioRepository;
     }
 
+    /**
+     * Envía y persiste de forma transaccional un nuevo mensaje de chat.
+     * Realiza un control anti-colisiones para verificar que un administrador no responda a un caso
+     * que esté asignado a otro agente. Autodetecta y gestiona el flujo de soporte del cliente.
+     *
+     * @param viajeId        Identificador opcional del viaje (para chats grupales de viajes).
+     * @param remitenteId    Identificador único del usuario que envía el mensaje.
+     * @param destinatarioId Identificador único del usuario destinatario (para chats privados).
+     * @param contenido      Contenido en texto del mensaje.
+     * @param tipoReceptor   Canal o tipo de receptor ('user', 'admin').
+     * @return El {@link MensajeChat} persistido.
+     * @throws ResourceNotFoundException Si el remitente especificado no se encuentra registrado.
+     * @throws ConflictException         Si un administrador intenta escribir en un chat asignado a otro agente.
+     */
     @Override
     @Transactional
     public MensajeChat enviarMensaje(Long viajeId, Long remitenteId, Long destinatarioId, String contenido, String tipoReceptor) {
@@ -90,7 +119,7 @@ public class ChatServiceImpl implements ChatService {
             // Si el remitente es un admin diferente del que está asignado, lanzar excepción
             if ("admin".equalsIgnoreCase(remitente.getRol())) {
                 if (soporteAsignado != null && !soporteAsignado.getId().equals(remitenteId)) {
-                    throw new ConflictException("CONFLICTO_ASIGNACION: Este chat está asignado al agente " + soporteAsignado.getNombre());
+                     throw new ConflictException("CONFLICTO_ASIGNACION: Este chat está asignado al agente " + soporteAsignado.getNombre());
                 }
                 // Si el chat es "Sin Asignar" y el admin escribe, auto-asignarlo automáticamente
                 if (soporteAsignado == null) {
@@ -122,6 +151,17 @@ public class ChatServiceImpl implements ChatService {
         return mensajeRepository.save(msg);
     }
 
+    /**
+     * Asigna un administrador o agente de soporte a un cliente específico para la atención del ticket.
+     * Si no existía una conversación activa con el cliente, genera e inyecta un mensaje automático de bienvenida.
+     *
+     * @param clienteId Identificador único del cliente.
+     * @param soporteId Identificador único del agente de soporte (administrador).
+     * @param categoria Categoría del caso de soporte (por ejemplo: pagos, reportes).
+     * @throws ResourceNotFoundException Si el agente de soporte no se encuentra registrado.
+     * @throws BadRequestException       Si el usuario a asignar no posee el rol de administrador.
+     * @throws ConflictException         Si el caso activo ya se encuentra tomado por otro administrador de soporte.
+     */
     @Override
     @Transactional
     public void asignarSoporte(Long clienteId, Long soporteId, String categoria) {
@@ -169,6 +209,12 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
+    /**
+     * Resuelve de manera transaccional un caso de soporte activo archivando y marcando todos
+     * los mensajes de chat asociados al cliente con el estado "resuelto".
+     *
+     * @param clienteId Identificador único del cliente cuyo caso de soporte se cerrará.
+     */
     @Override
     @Transactional
     public void resolverCaso(Long clienteId) {
@@ -179,21 +225,45 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
+    /**
+     * Obtiene todo el historial de chat de un viaje particular ordenado cronológicamente.
+     *
+     * @param viajeId Identificador único del viaje.
+     * @return Lista de {@link MensajeChat} de dicho viaje.
+     */
     @Override
     public List<MensajeChat> getHistorialPorViaje(Long viajeId) {
         return mensajeRepository.findByViajeIdOrderByTimestampAsc(viajeId);
     }
 
+    /**
+     * Obtiene el historial de mensajes bidireccional entre dos usuarios específicos.
+     *
+     * @param userId1 Identificador del primer participante del chat.
+     * @param userId2 Identificador del segundo participante del chat.
+     * @return Lista de {@link MensajeChat} compartidos.
+     */
     @Override
     public List<MensajeChat> getHistorialEntreUsuarios(Long userId1, Long userId2) {
         return mensajeRepository.getChatHistoryBetweenUsers(userId1, userId2);
     }
 
+    /**
+     * Obtiene el historial de mensajes del canal de soporte asociado a un cliente específico.
+     *
+     * @param clienteId Identificador único del cliente.
+     * @return Lista de {@link MensajeChat} correspondientes a los chats de soporte de dicho cliente.
+     */
     @Override
     public List<MensajeChat> getHistorialSoporteCliente(Long clienteId) {
         return mensajeRepository.getHistorialSoporteCliente(clienteId);
     }
 
+    /**
+     * Marca un conjunto de mensajes como leídos de forma masiva en la base de datos.
+     *
+     * @param mensajeIds Lista de identificadores de mensajes a marcar como leídos.
+     */
     @Override
     @Transactional
     public void marcarComoLeidos(List<Long> mensajeIds) {
@@ -202,3 +272,4 @@ public class ChatServiceImpl implements ChatService {
         mensajeRepository.saveAll(mensajes);
     }
 }
+

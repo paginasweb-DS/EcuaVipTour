@@ -1,44 +1,76 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { AuthService } from './auth.service';
+import { SoapService } from './soap.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  private apiUrl = 'http://127.0.0.1:5001/api/chat';
+  private namespace = 'http://ecuaviptour.com/soap/chat';
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
-
-  private getHeaders() {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  }
+  constructor(private soapService: SoapService, private authService: AuthService) { }
 
   getHistorial(otroId: number, tipoReceptor: string = 'admin', viajeId?: number): Observable<any[]> {
-    let url = `${this.apiUrl}/history/${otroId}?tipo_receptor=${tipoReceptor}`;
-    if (viajeId) {
-      url += `&viaje_id=${viajeId}`;
-    }
-    return this.http.get<any[]>(url, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'getHistoryRequest',
+      {
+        target_id: otroId,
+        viaje_id: viajeId,
+        tipo_receptor: tipoReceptor
+      },
+      this.authService.getToken() || undefined
+    ).pipe(
+      map(res => {
+        return (res && res.messages) || [];
+      })
+    );
   }
 
   markAsRead(otroId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/mark_read/${otroId}`, {}, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'markReadRequest',
+      { otro_id: otroId },
+      this.authService.getToken() || undefined
+    );
   }
 
   getAdminInfo(): Observable<{ admin_id: number; admin_nombre: string }> {
-    return this.http.get<any>(`${this.apiUrl}/admin-info`, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'getAdminInfoRequest',
+      {},
+      this.authService.getToken() || undefined
+    ).pipe(
+      map(res => {
+        return {
+          admin_id: res ? res.admin_id : 0,
+          admin_nombre: res ? res.admin_nombre : ''
+        };
+      })
+    );
   }
 
   assignSupport(clienteId: number, categoria: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/assign/${clienteId}`, { categoria }, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'assignSupportRequest',
+      {
+        cliente_id: clienteId,
+        categoria: categoria
+      },
+      this.authService.getToken() || undefined
+    );
   }
 
   resolveCase(clienteId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/resolve/${clienteId}`, {}, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'resolveCaseRequest',
+      { cliente_id: clienteId },
+      this.authService.getToken() || undefined
+    );
   }
 }

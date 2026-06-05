@@ -4,22 +4,41 @@ import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Objects;
 
+/**
+ * Entidad de persistencia que representa un boleto virtual o ticket QR generado para un viaje.
+ * Sirve para validar la autenticidad y el abordaje seguro del pasajero al vehículo mediante escaneo de código hash.
+ * 
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Entity
 @Table(name = "ticketqr")
 public class TicketQR {
 
+    /**
+     * Identificador único autoincremental del ticket QR.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Relación ManyToOne con el viaje asociado al ticket. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "viaje_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Viaje viaje;
 
+    /**
+     * Código de validación hash único e inequívoco del ticket.
+     */
     @Column(name = "codigo_hash", nullable = false, unique = true)
     private String codigoHash;
 
+    /**
+     * Estado del ticket QR (ej. 'generado', 'usado', 'expirado').
+     */
     @Column(length = 20, nullable = false)
     private String estado = "generado";
 

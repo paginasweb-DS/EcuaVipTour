@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://ecuaviptour.com/soap/chofer"
+           xmlns:tns="http://ecuaviptour.com/soap/chofer"
+           elementFormDefault="qualified">
+
+    <xs:complexType name="vehiculoSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="placa" type="xs:string" minOccurs="0"/>
+            <xs:element name="marca" type="xs:string" minOccurs="0"/>
+            <xs:element name="modelo" type="xs:string" minOccurs="0"/>
+            <xs:element name="anio" type="xs:int" minOccurs="0"/>
+            <xs:element name="tipo_vehiculo" type="xs:string" minOccurs="0"/>
+            <xs:element name="capacidad_max" type="xs:int" minOccurs="0"/>
+            <xs:element name="color" type="xs:string" minOccurs="0"/>
+            <xs:element name="estado" type="xs:string" minOccurs="0"/>
+            <xs:element name="foto_auto_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="foto_matricula_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="foto_licencia_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="licencia_tipo" type="xs:string" minOccurs="0"/>
+            <xs:element name="licencia_vigencia" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="viajeChoferSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="origen" type="xs:string"/>
+            <xs:element name="destino" type="xs:string"/>
+            <xs:element name="distancia_km" type="xs:double"/>
+            <xs:element name="tarifa" type="xs:double"/>
+            <xs:element name="monto" type="xs:double" minOccurs="0"/>
+            <xs:element name="tipo_servicio" type="xs:string"/>
+            <xs:element name="fecha" type="xs:string"/>
+            <xs:element name="cliente" type="xs:string" minOccurs="0"/>
+            <xs:element name="estado_logistico" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Get Vehiculo -->
+    <xs:element name="getVehiculoRequest">
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getVehiculoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="vehiculo" type="tns:vehiculoSoapType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Update Vehiculo -->
+    <xs:element name="updateVehiculoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="placa" type="xs:string" minOccurs="0"/>
+                <xs:element name="marca" type="xs:string" minOccurs="0"/>
+                <xs:element name="modelo" type="xs:string" minOccurs="0"/>
+                <xs:element name="anio" type="xs:int" minOccurs="0"/>
+                <xs:element name="tipo_vehiculo" type="xs:string" minOccurs="0"/>
+                <xs:element name="capacidad_max" type="xs:int" minOccurs="0"/>
+                <xs:element name="color" type="xs:string" minOccurs="0"/>
+                <xs:element name="licencia_tipo" type="xs:string" minOccurs="0"/>
+                <xs:element name="licencia_vigencia" type="xs:string" minOccurs="0"/>
+                <xs:element name="foto_auto_base64" type="xs:string" minOccurs="0"/>
+                <xs:element name="foto_auto_filename" type="xs:string" minOccurs="0"/>
+                <xs:element name="foto_matricula_base64" type="xs:string" minOccurs="0"/>
+                <xs:element name="foto_matricula_filename" type="xs:string" minOccurs="0"/>
+                <xs:element name="foto_licencia_base64" type="xs:string" minOccurs="0"/>
+                <xs:element name="foto_licencia_filename" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="updateVehiculoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="estado" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Viajes Disponibles -->
+    <xs:element name="getViajesDisponiblesRequest">
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getViajesDisponiblesResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="viajes" type="tns:viajeChoferSoapType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Mis Viajes Chofer -->
+    <xs:element name="getMisViajesChoferRequest">
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getMisViajesChoferResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="viajes" type="tns:viajeChoferSoapType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

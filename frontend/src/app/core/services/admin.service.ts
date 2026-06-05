@@ -1,44 +1,82 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, BehaviorSubject, tap, map } from 'rxjs';
 import { AuthService } from './auth.service';
 import { ChatService } from './chat.service';
+import { SoapService } from './soap.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-  private apiUrl = 'http://127.0.0.1:5001/api/admin';
+  private namespace = 'http://ecuaviptour.com/soap/admin';
   private pendingCountSource = new BehaviorSubject<number>(0);
   pendingCount$ = this.pendingCountSource.asObservable();
 
   private unreadCountSource = new BehaviorSubject<number>(0);
   unreadCount$ = this.unreadCountSource.asObservable();
 
-  constructor(private http: HttpClient, private authService: AuthService, private chatService: ChatService) { }
-
-  private getHeaders() {
-    const token = this.authService.getToken();
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-  }
+  constructor(
+    private soapService: SoapService, 
+    private authService: AuthService,
+    private chatService: ChatService
+  ) { }
 
   getPagos(estado: string = 'pendientes'): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/pagos?estado=${estado}&_t=${Date.now()}`, { headers: this.getHeaders() })
-      .pipe(tap(pagos => {
+    return this.soapService.post(
+      this.namespace,
+      'getPagosRequest',
+      { estado },
+      this.authService.getToken() || undefined
+    ).pipe(
+      map(res => {
+        const pagos = (res && res.pagos) || [];
+        return pagos.map((p: any) => ({
+          pago_id: p.id,
+          viaje_id: p.viaje_id,
+          cliente_nombre: p.cliente_nombre,
+          cliente_cedula: p.cliente_cedula,
+          monto: p.monto_total,
+          comprobante_url: p.comprobante_url,
+          fecha: p.fecha_subida,
+          estado_pago: p.estado,
+          origen: p.origen,
+          destino: p.destino
+        }));
+      }),
+      tap(pagos => {
         if (estado === 'pendientes') {
           this.pendingCountSource.next(pagos.length);
         }
-      }));
+      })
+    );
   }
 
   getInbox(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/inbox`, { headers: this.getHeaders() })
-      .pipe(tap(inbox => {
+    return this.soapService.post(
+      this.namespace,
+      'getInboxRequest',
+      {},
+      this.authService.getToken() || undefined
+    ).pipe(
+      map(res => {
+        const chats = (res && res.chats) || [];
+        return chats.map((c: any) => ({
+          cliente_id: c.cliente_id,
+          cliente_nombre: c.cliente_nombre,
+          ultimo_mensaje: c.ultimo_mensaje,
+          fecha_ultimo_mensaje: c.fecha,
+          unread: c.unread,
+          foto_perfil_url: c.cliente_foto_url,
+          soporte_asignado_nombre: c.asignado_a,
+          categoria: c.categoria,
+          estado: c.resuelto ? 'resuelto' : 'abierto'
+        }));
+      }),
+      tap(inbox => {
         const chatsConUnread = inbox.filter((c: any) => (c.unread || 0) > 0).length;
         this.unreadCountSource.next(chatsConUnread);
-      }));
+      })
+    );
   }
 
   updatePendingCount(count: number) {
@@ -54,70 +92,179 @@ export class AdminService {
   }
 
   aprobarPago(pagoId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/aprobar_pago`, { pago_id: pagoId }, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'aprobarPagoRequest',
+      { pago_id: pagoId },
+      this.authService.getToken() || undefined
+    );
   }
 
   rechazarPago(pagoId: number, motivo: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/rechazar_pago`, { pago_id: pagoId, motivo }, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'rechazarPagoRequest',
+      { pago_id: pagoId, motivo },
+      this.authService.getToken() || undefined
+    );
   }
 
   getUsuarios(rol?: string, search?: string, activo?: string, sort?: string, start_date?: string, end_date?: string, fecha_viaje?: string, duracion_minutos?: number): Observable<any[]> {
-    let url = `${this.apiUrl}/usuarios`;
-    const params = [];
-    if (rol) params.push(`rol=${rol}`);
-    if (search) params.push(`search=${search}`);
-    if (activo) params.push(`activo=${activo}`);
-    if (sort) params.push(`sort=${sort}`);
-    if (start_date) params.push(`start_date=${start_date}`);
-    if (end_date) params.push(`end_date=${end_date}`);
-    if (fecha_viaje) params.push(`fecha_viaje=${fecha_viaje}`);
-    if (duracion_minutos) params.push(`duracion_minutos=${duracion_minutos}`);
-    if (params.length > 0) url += `?${params.join('&')}`;
-    
-    return this.http.get<any[]>(url, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'getUsuariosRequest',
+      {
+        rol,
+        search,
+        activo,
+        sort,
+        start_date,
+        end_date,
+        fecha_viaje,
+        duracion_minutos
+      },
+      this.authService.getToken() || undefined
+    ).pipe(
+      map(res => {
+        const list = (res && res.usuarios) || [];
+        return list.map((u: any) => ({
+          id: u.id,
+          nombre: u.nombre,
+          correo: u.correo,
+          telefono: u.telefono,
+          cedula: u.cedula,
+          rol: u.rol,
+          activo: u.activo,
+          fecha_registro: u.fecha_registro,
+          foto_perfil_url: u.foto_perfil_url
+        }));
+      })
+    );
   }
 
   toggleUsuarioStatus(usuarioId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/usuarios/toggle_status`, { usuario_id: usuarioId }, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'toggleUsuarioStatusRequest',
+      { usuario_id: usuarioId },
+      this.authService.getToken() || undefined
+    );
   }
 
   updateUsuarioAdmin(usuarioId: number, data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/usuarios/update`, { usuario_id: usuarioId, ...data }, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'updateUsuarioAdminRequest',
+      {
+        usuario_id: usuarioId,
+        nombre: data.nombre,
+        telefono: data.telefono,
+        cedula: data.cedula,
+        rol: data.rol,
+        correo: data.correo,
+        password: data.password
+      },
+      this.authService.getToken() || undefined
+    );
   }
 
   updateUsuarioPhotoAdmin(usuarioId: number, file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('usuario_id', usuarioId.toString());
-    formData.append('foto', file);
-    return this.http.post(`${this.apiUrl}/usuarios/update_photo`, formData, { headers: this.getHeaders() });
+    return new Observable(observer => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64Data = reader.result as string;
+        this.soapService.post(
+          this.namespace,
+          'updateUsuarioPhotoAdminRequest',
+          {
+            usuario_id: usuarioId,
+            file_base64: base64Data,
+            filename: file.name
+          },
+          this.authService.getToken() || undefined
+        ).subscribe({
+          next: (res) => {
+            observer.next(res);
+            observer.complete();
+          },
+          error: (err) => observer.error(err)
+        });
+      };
+      reader.onerror = (error) => observer.error(error);
+    });
   }
 
   getStats(period: string = 'month', startDate?: string, endDate?: string): Observable<any> {
-    let url = `${this.apiUrl}/stats?period=${period}`;
-    if (startDate) url += `&start_date=${startDate}`;
-    if (endDate) url += `&end_date=${endDate}`;
-    return this.http.get<any>(url, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'getStatsRequest',
+      {
+        period,
+        start_date: startDate,
+        end_date: endDate
+      },
+      this.authService.getToken() || undefined
+    ).pipe(
+      map(res => {
+        const jsonStr = res ? (res.stats_json || res.statsJson) : null;
+        return JSON.parse(jsonStr || '{}');
+      })
+    );
   }
 
   getVehiculos(estado?: string, search?: string, marca?: string, modelo?: string, anio?: string, tipo?: string, asientos?: string): Observable<any[]> {
-    let url = `${this.apiUrl}/vehiculos`;
-    const params = [];
-    if (estado) params.push(`estado=${estado}`);
-    if (search) params.push(`search=${search}`);
-    if (marca) params.push(`marca=${marca}`);
-    if (modelo) params.push(`modelo=${modelo}`);
-    if (anio) params.push(`anio=${anio}`);
-    if (tipo) params.push(`tipo=${tipo}`);
-    if (asientos) params.push(`asientos=${asientos}`);
-    
-    if (params.length > 0) url += `?${params.join('&')}`;
-    return this.http.get<any[]>(url, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'getVehiculosRequest',
+      {
+        estado,
+        search,
+        marca,
+        modelo,
+        anio,
+        tipo,
+        asientos
+      },
+      this.authService.getToken() || undefined
+    ).pipe(
+      map(res => {
+        const list = (res && res.vehiculos) || [];
+        return list.map((v: any) => ({
+          id: v.id,
+          placa: v.placa,
+          marca: v.marca,
+          modelo: v.modelo,
+          anio: v.anio,
+          tipo_vehiculo: v.tipo,
+          capacidad_max: v.capacidad_max,
+          color: v.color,
+          estado: v.estado,
+          foto_auto_url: v.foto_auto_url,
+          foto_matricula_url: v.foto_matricula_url,
+          foto_licencia_url: v.foto_licencia_url,
+          chofer: {
+            id: v.chofer_id,
+            nombre: v.chofer_nombre
+          }
+        }));
+      })
+    );
   }
 
   cambiarEstadoVehiculo(vehiculoId: number, nuevoEstado: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/vehiculos/estado`, { 
-      vehiculo_id: vehiculoId, 
-      estado: nuevoEstado 
-    }, { headers: this.getHeaders() });
+    return this.soapService.post(
+      this.namespace,
+      'cambiarEstadoVehiculoRequest',
+      {
+        vehiculo_id: vehicleIdFix(vehiculoId),
+        estado: nuevoEstado
+      },
+      this.authService.getToken() || undefined
+    );
   }
+}
+
+function vehicleIdFix(id: any): number {
+  return typeof id === 'number' ? id : Number(id);
 }

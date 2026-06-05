@@ -85,13 +85,15 @@ export class ChatSidebarComponent implements OnInit, OnChanges, OnDestroy, After
 
   processMessage(m: any): any {
     const remitente_id = m.remitente_id != null ? Number(m.remitente_id) : (m.remitente ? Number(m.remitente.id) : null);
-    const destinatario_id = m.destinatario_id != null ? Number(m.destinatario_id) : (m.destinatario ? Number(m.destinatario.id) : null);
+    const destinatario_id = m.destinatario_id != null ? Number(m.destinatario_id) : (m.destinatario ? Number(m.destinatario.id) : (m.receptor_id ? Number(m.receptor_id) : null));
     const viaje_id = m.viaje_id != null ? Number(m.viaje_id) : (m.viaje ? Number(m.viaje.id) : null);
+    const timestamp = m.timestamp || m.fecha_envio;
     return {
       ...m,
       remitente_id,
       destinatario_id,
-      viaje_id
+      viaje_id,
+      timestamp
     };
   }
 

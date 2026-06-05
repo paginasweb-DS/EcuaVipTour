@@ -293,7 +293,7 @@
   <app-chat-sidebar 
     [isOpen]="isChatOpen" 
     tipoReceptor="chofer" 
-    [viajeId]="viajeActual?.viaje_id" 
+    [viajeId]="viajeActual?.viaje_id || viajeActual?.id" 
     [destinatarioId]="viajeActual?.chofer_id" 
     [tituloCabecera]="'Chofer: ' + (viajeActual?.nombre_chofer || 'Conductor VIP')" 
     [fotoPerfilUrl]="viajeActual?.foto_chofer_url || viajeActual?.chofer?.foto_perfil_url"

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://ecuaviptour.com/soap/chat"
+           xmlns:tns="http://ecuaviptour.com/soap/chat"
+           elementFormDefault="qualified">
+
+    <xs:complexType name="mensajeChatSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="remitente_id" type="xs:long" minOccurs="0"/>
+            <xs:element name="remitente_nombre" type="xs:string" minOccurs="0"/>
+            <xs:element name="receptor_id" type="xs:long" minOccurs="0"/>
+            <xs:element name="receptor_nombre" type="xs:string" minOccurs="0"/>
+            <xs:element name="contenido" type="xs:string"/>
+            <xs:element name="leido" type="xs:boolean"/>
+            <xs:element name="fecha_envio" type="xs:string" minOccurs="0"/>
+            <xs:element name="viaje_id" type="xs:long" minOccurs="0"/>
+            <xs:element name="tipo_receptor" type="xs:string" minOccurs="0"/>
+            <xs:element name="categoria" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Get History -->
+    <xs:element name="getHistoryRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="target_id" type="xs:long"/>
+                <xs:element name="viaje_id" type="xs:long" minOccurs="0"/>
+                <xs:element name="tipo_receptor" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getHistoryResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="messages" type="tns:mensajeChatSoapType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Mark Read -->
+    <xs:element name="markReadRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="otro_id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="markReadResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="updated" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Admin Info -->
+    <xs:element name="getAdminInfoRequest">
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getAdminInfoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="admin_id" type="xs:long"/>
+                <xs:element name="admin_nombre" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Assign Support -->
+    <xs:element name="assignSupportRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="cliente_id" type="xs:long"/>
+                <xs:element name="categoria" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="assignSupportResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="success" type="xs:boolean"/>
+                <xs:element name="message" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Resolve Case -->
+    <xs:element name="resolveCaseRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="cliente_id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="resolveCaseResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="success" type="xs:boolean"/>
+                <xs:element name="message" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

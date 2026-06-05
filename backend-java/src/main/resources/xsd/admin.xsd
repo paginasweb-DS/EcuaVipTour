@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://ecuaviptour.com/soap/admin"
+           xmlns:tns="http://ecuaviptour.com/soap/admin"
+           elementFormDefault="qualified">
+
+    <!-- Shared/Common types for Admin -->
+    <xs:complexType name="usuarioSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="nombre" type="xs:string"/>
+            <xs:element name="correo" type="xs:string"/>
+            <xs:element name="telefono" type="xs:string" minOccurs="0"/>
+            <xs:element name="cedula" type="xs:string" minOccurs="0"/>
+            <xs:element name="rol" type="xs:string"/>
+            <xs:element name="activo" type="xs:boolean"/>
+            <xs:element name="fecha_registro" type="xs:string" minOccurs="0"/>
+            <xs:element name="foto_perfil_url" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="vehiculoSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="placa" type="xs:string" minOccurs="0"/>
+            <xs:element name="marca" type="xs:string" minOccurs="0"/>
+            <xs:element name="modelo" type="xs:string" minOccurs="0"/>
+            <xs:element name="anio" type="xs:int" minOccurs="0"/>
+            <xs:element name="tipo" type="xs:string" minOccurs="0"/>
+            <xs:element name="capacidad_max" type="xs:int" minOccurs="0"/>
+            <xs:element name="color" type="xs:string" minOccurs="0"/>
+            <xs:element name="estado" type="xs:string" minOccurs="0"/>
+            <xs:element name="foto_auto_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="foto_matricula_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="foto_licencia_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="chofer_id" type="xs:long" minOccurs="0"/>
+            <xs:element name="chofer_nombre" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="pagoSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="comprobante_url" type="xs:string"/>
+            <xs:element name="fecha_subida" type="xs:string" minOccurs="0"/>
+            <xs:element name="estado" type="xs:string"/>
+            <xs:element name="viaje_id" type="xs:long"/>
+            <xs:element name="monto_total" type="xs:double"/>
+            <xs:element name="cliente_nombre" type="xs:string" minOccurs="0"/>
+            <xs:element name="cliente_cedula" type="xs:string" minOccurs="0"/>
+            <xs:element name="origen" type="xs:string" minOccurs="0"/>
+            <xs:element name="destino" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="inboxChatSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="cliente_id" type="xs:long"/>
+            <xs:element name="cliente_nombre" type="xs:string"/>
+            <xs:element name="cliente_foto_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="ultimo_mensaje" type="xs:string" minOccurs="0"/>
+            <xs:element name="leido" type="xs:boolean"/>
+            <xs:element name="unread" type="xs:int"/>
+            <xs:element name="fecha" type="xs:string" minOccurs="0"/>
+            <xs:element name="asignado_a" type="xs:string" minOccurs="0"/>
+            <xs:element name="categoria" type="xs:string" minOccurs="0"/>
+            <xs:element name="resuelto" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Get Pagos -->
+    <xs:element name="getPagosRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="estado" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getPagosResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="pagos" type="tns:pagoSoapType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Inbox -->
+    <xs:element name="getInboxRequest">
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getInboxResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="chats" type="tns:inboxChatSoapType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Aprobar Pago -->
+    <xs:element name="aprobarPagoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="pago_id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="aprobarPagoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="success" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Rechazar Pago -->
+    <xs:element name="rechazarPagoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="pago_id" type="xs:long"/>
+                <xs:element name="motivo" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="rechazarPagoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="success" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Usuarios -->
+    <xs:element name="getUsuariosRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="rol" type="xs:string" minOccurs="0"/>
+                <xs:element name="search" type="xs:string" minOccurs="0"/>
+                <xs:element name="activo" type="xs:string" minOccurs="0"/>
+                <xs:element name="sort" type="xs:string" minOccurs="0"/>
+                <xs:element name="start_date" type="xs:string" minOccurs="0"/>
+                <xs:element name="end_date" type="xs:string" minOccurs="0"/>
+                <xs:element name="fecha_viaje" type="xs:string" minOccurs="0"/>
+                <xs:element name="duracion_minutos" type="xs:int" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getUsuariosResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="usuarios" type="tns:usuarioSoapType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Toggle Usuario Status -->
+    <xs:element name="toggleUsuarioStatusRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="usuario_id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="toggleUsuarioStatusResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="success" type="xs:boolean"/>
+                <xs:element name="activo" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Update Usuario Admin -->
+    <xs:element name="updateUsuarioAdminRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="usuario_id" type="xs:long"/>
+                <xs:element name="nombre" type="xs:string" minOccurs="0"/>
+                <xs:element name="telefono" type="xs:string" minOccurs="0"/>
+                <xs:element name="cedula" type="xs:string" minOccurs="0"/>
+                <xs:element name="rol" type="xs:string" minOccurs="0"/>
+                <xs:element name="correo" type="xs:string" minOccurs="0"/>
+                <xs:element name="password" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="updateUsuarioAdminResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="success" type="xs:boolean"/>
+                <xs:element name="usuario" type="tns:usuarioSoapType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Update Usuario Photo Admin -->
+    <xs:element name="updateUsuarioPhotoAdminRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="usuario_id" type="xs:long"/>
+                <xs:element name="file_base64" type="xs:string"/>
+                <xs:element name="filename" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="updateUsuarioPhotoAdminResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="success" type="xs:boolean"/>
+                <xs:element name="foto_perfil_url" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Stats -->
+    <xs:element name="getStatsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="period" type="xs:string" minOccurs="0"/>
+                <xs:element name="start_date" type="xs:string" minOccurs="0"/>
+                <xs:element name="end_date" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getStatsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="stats_json" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Vehiculos -->
+    <xs:element name="getVehiculosRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="estado" type="xs:string" minOccurs="0"/>
+                <xs:element name="search" type="xs:string" minOccurs="0"/>
+                <xs:element name="marca" type="xs:string" minOccurs="0"/>
+                <xs:element name="modelo" type="xs:string" minOccurs="0"/>
+                <xs:element name="anio" type="xs:string" minOccurs="0"/>
+                <xs:element name="tipo" type="xs:string" minOccurs="0"/>
+                <xs:element name="asientos" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getVehiculosResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="vehiculos" type="tns:vehiculoSoapType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Cambiar Estado Vehiculo -->
+    <xs:element name="cambiarEstadoVehiculoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="vehiculo_id" type="xs:long"/>
+                <xs:element name="estado" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="cambiarEstadoVehiculoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="success" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

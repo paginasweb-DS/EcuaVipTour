@@ -80,7 +80,18 @@
             <version>2.0.12</version>
         </dependency>
 
+        <!-- Spring Boot Web Services Starter for SOAP -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web-services</artifactId>
+        </dependency>
         
+        <!-- WSDL4J to dynamically generate WSDL from XSD schemas -->
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+        </dependency>
+
         <!-- Spring Boot Test Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -100,6 +111,29 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            
+            <!-- JAXB2 Maven Plugin for generating Jakarta XML classes from XSD schemas -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>schemagen</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sources>
+                        <source>${project.basedir}/src/main/resources/xsd</source>
+                    </sources>
+                    <outputDirectory>${project.build.directory}/generated-sources/jaxb</outputDirectory>
+                    <clearOutputDir>false</clearOutputDir>
+                    <failOnNoSchemas>false</failOnNoSchemas>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -63,7 +63,7 @@ import { ChatSidebarComponent } from '../../../shared/components/chat-sidebar/ch
                   </div>
                   <div>
                     <h4 class="text-base font-black text-gray-900 leading-tight">{{ viajeActual.nombre_cliente || 'Pasajero VIP' }}</h4>
-                    <p class="text-[8px] font-bold text-blue-600 uppercase tracking-widest">En Curso • $ {{ viajeActual.tarifa }}</p>
+                    <p class="text-[8px] font-bold text-blue-600 uppercase tracking-widest">En Curso • $ {{ viajeActual.tarifa || viajeActual.monto }}</p>
                   </div>
                 </div>
               </div>

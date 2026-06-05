@@ -67,7 +67,18 @@ export class ReservaPagoComponent implements OnInit, OnDestroy {
         this.router.navigate(['/cliente/cotizar']);
       } else {
         // New booking: start a 15-minute countdown on-screen
-        const targetDate = new Date(Date.now() + 15 * 60000).toISOString();
+        const currentKey = `${this.reservaParams.origen}|${this.reservaParams.destino}|${this.reservaParams.tarifa}|${this.reservaParams.pasajeros}|${this.reservaParams.hora}|${this.reservaParams.asientos}`;
+        const savedKey = sessionStorage.getItem('reserva_pago_key');
+        const savedLimit = sessionStorage.getItem('reserva_pago_limite');
+        let targetDate: string;
+
+        if (savedKey === currentKey && savedLimit) {
+          targetDate = savedLimit;
+        } else {
+          targetDate = new Date(Date.now() + 15 * 60000).toISOString();
+          sessionStorage.setItem('reserva_pago_key', currentKey);
+          sessionStorage.setItem('reserva_pago_limite', targetDate);
+        }
         this.startCountdown(targetDate);
       }
     });
@@ -86,6 +97,8 @@ export class ReservaPagoComponent implements OnInit, OnDestroy {
     this.countdown$ = this.countdownService.getCountdown(targetDate);
     this.countdownSub = this.countdown$.subscribe((val: any) => {
       if (val && val.isExpired) {
+        sessionStorage.removeItem('reserva_pago_key');
+        sessionStorage.removeItem('reserva_pago_limite');
         alert('El tiempo límite para realizar el pago ha expirado. Tu reservación ha sido cancelada.');
         this.autoCancelarViaje();
       }
@@ -93,6 +106,8 @@ export class ReservaPagoComponent implements OnInit, OnDestroy {
   }
 
   autoCancelarViaje() {
+    sessionStorage.removeItem('reserva_pago_key');
+    sessionStorage.removeItem('reserva_pago_limite');
     const viajeId = this.reservaParams.viajeId;
     if (viajeId) {
       this.clienteService.cancelarViaje(Number(viajeId)).subscribe({
@@ -136,6 +151,8 @@ export class ReservaPagoComponent implements OnInit, OnDestroy {
       const viajeId = this.reservaParams.viajeId;
       this.reservaService.subirComprobante(viajeId, this.selectedFile!).subscribe({
         next: () => {
+          sessionStorage.removeItem('reserva_pago_key');
+          sessionStorage.removeItem('reserva_pago_limite');
           this.loading = false;
           this.success = true;
         },
@@ -151,6 +168,8 @@ export class ReservaPagoComponent implements OnInit, OnDestroy {
           const viajeId = res.viaje_id;
           this.reservaService.subirComprobante(viajeId, this.selectedFile!).subscribe({
             next: () => {
+              sessionStorage.removeItem('reserva_pago_key');
+              sessionStorage.removeItem('reserva_pago_limite');
               this.loading = false;
               this.success = true;
             },
@@ -172,6 +191,8 @@ export class ReservaPagoComponent implements OnInit, OnDestroy {
     const confirmacion = confirm('¿Estás seguro de que deseas cancelar esta reservación?');
     if (!confirmacion) return;
 
+    sessionStorage.removeItem('reserva_pago_key');
+    sessionStorage.removeItem('reserva_pago_limite');
     const viajeId = this.reservaParams.viajeId;
     if (viajeId) {
       this.loading = true;

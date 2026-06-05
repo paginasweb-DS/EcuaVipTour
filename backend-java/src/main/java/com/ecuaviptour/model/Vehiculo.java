@@ -4,55 +4,111 @@ import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Objects;
 
+/**
+ * Entidad de persistencia que representa un vehículo registrado en la flota de la cooperativa.
+ * Mapea información del automóvil (placa, marca, modelo, tipo, capacidad), las credenciales de habilitación
+ * del chofer (licencias, matrículas en formato imagen) y su estado de aprobación logística.
+ * 
+ * @author Santiago T.
+ * @version 1.0
+ */
 @Entity
 @Table(name = "vehiculo")
 public class Vehiculo {
 
+    /**
+     * Identificador único autoincremental del vehículo.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Placa patente única del vehículo.
+     */
     @Column(nullable = false, unique = true, length = 20)
     private String placa;
 
+    /**
+     * Marca fabricante del vehículo.
+     */
     @Column(length = 30)
     private String marca;
 
+    /**
+     * Modelo comercial del vehículo.
+     */
     @Column(length = 50)
     private String modelo;
 
+    /**
+     * Año de fabricación del vehículo.
+     */
     private Integer anio;
 
+    /**
+     * Categoría o tipo de vehículo (ej. 'furgoneta', 'sedan', 'suv').
+     */
     @Column(name = "tipo_vehiculo", length = 20)
     private String tipoVehiculo; // furgoneta, sedan, suv
 
+    /**
+     * Capacidad máxima de pasajeros permitida por el vehículo.
+     */
     @Column(name = "capacidad_max", nullable = false)
     private Integer capacidadMax;
 
+    /**
+     * Color exterior del vehículo.
+     */
     @Column(length = 30)
     private String color;
 
+    /**
+     * Indica si el vehículo es de uso privado o está reservado en exclusividad.
+     */
     @Column(name = "es_privado", nullable = false)
     private Boolean esPrivado = false;
 
+    /**
+     * Estado de habilitación operativa del vehículo (ej. 'pendiente', 'activo', 'rechazado').
+     */
     @Column(length = 20, nullable = false)
     private String estado = "pendiente"; // pendiente, activo, rechazado
 
+    /**
+     * URL o ruta del almacenamiento en disco de la fotografía del auto.
+     */
     @Column(name = "foto_auto_url", columnDefinition = "TEXT")
     private String fotoAutoUrl;
 
+    /**
+     * URL o ruta del almacenamiento en disco del escaneo de la matrícula del vehículo.
+     */
     @Column(name = "foto_matricula_url", columnDefinition = "TEXT")
     private String fotoMatriculaUrl;
 
+    /**
+     * URL o ruta del almacenamiento en disco del escaneo de la licencia de conducir del chofer.
+     */
     @Column(name = "foto_licencia_url", columnDefinition = "TEXT")
     private String fotoLicenciaUrl;
 
+    /**
+     * Categoría o tipo de licencia de conducir declarada (ej. 'Tipo E', 'Tipo C').
+     */
     @Column(name = "licencia_tipo", length = 100)
     private String licenciaTipo;
 
+    /**
+     * Fecha de vigencia o expiración de la licencia de conducir.
+     */
     @Column(name = "licencia_vigencia", length = 100)
     private String licenciaVigencia;
 
+    /**
+     * Relación ManyToOne con el usuario chofer asignado a este vehículo. Carga diferida (LAZY).
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chofer_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "passwordHash"})

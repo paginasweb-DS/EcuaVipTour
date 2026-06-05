@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://ecuaviptour.com/soap/viajes"
+           xmlns:tns="http://ecuaviptour.com/soap/viajes"
+           elementFormDefault="qualified">
+
+    <xs:complexType name="usuarioSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="nombre" type="xs:string"/>
+            <xs:element name="correo" type="xs:string"/>
+            <xs:element name="telefono" type="xs:string" minOccurs="0"/>
+            <xs:element name="cedula" type="xs:string" minOccurs="0"/>
+            <xs:element name="fotoPerfilUrl" type="xs:string" minOccurs="0"/>
+            <xs:element name="rol" type="xs:string"/>
+            <xs:element name="activo" type="xs:boolean"/>
+            <xs:element name="fechaRegistro" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="vehiculoSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long" minOccurs="0"/>
+            <xs:element name="placa" type="xs:string" minOccurs="0"/>
+            <xs:element name="marca" type="xs:string" minOccurs="0"/>
+            <xs:element name="modelo" type="xs:string" minOccurs="0"/>
+            <xs:element name="anio" type="xs:int" minOccurs="0"/>
+            <xs:element name="tipo" type="xs:string" minOccurs="0"/>
+            <xs:element name="capacidadMax" type="xs:int" minOccurs="0"/>
+            <xs:element name="color" type="xs:string" minOccurs="0"/>
+            <xs:element name="estado" type="xs:string" minOccurs="0"/>
+            <xs:element name="fotoAutoUrl" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="calificacionSoapType">
+        <xs:sequence>
+            <xs:element name="estrellas" type="xs:int"/>
+            <xs:element name="comentario" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="viajeSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="viaje_id" type="xs:long" minOccurs="0"/>
+            <xs:element name="origen" type="xs:string"/>
+            <xs:element name="destino" type="xs:string"/>
+            <xs:element name="distancia_km" type="xs:double"/>
+            <xs:element name="monto" type="xs:double"/>
+            <xs:element name="estado_pago" type="xs:string"/>
+            <xs:element name="estado_logistico" type="xs:string"/>
+            <xs:element name="tipo_servicio" type="xs:string"/>
+            <xs:element name="fecha" type="xs:string"/>
+            <xs:element name="fecha_limite_pago" type="xs:string" minOccurs="0"/>
+            <xs:element name="comentario_rechazo" type="xs:string" minOccurs="0"/>
+            <xs:element name="qr_hash" type="xs:string" minOccurs="0"/>
+            <xs:element name="nombre_chofer" type="xs:string" minOccurs="0"/>
+            <xs:element name="chofer_id" type="xs:long" minOccurs="0"/>
+            <xs:element name="foto_chofer_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="cliente_id" type="xs:long" minOccurs="0"/>
+            <xs:element name="nombre_cliente" type="xs:string" minOccurs="0"/>
+            <xs:element name="foto_cliente_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="chofer" type="tns:usuarioSoapType" minOccurs="0"/>
+            <xs:element name="vehiculo" type="tns:vehiculoSoapType" minOccurs="0"/>
+            <xs:element name="calificacion" type="tns:calificacionSoapType" minOccurs="0"/>
+            <xs:element name="asientos" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Cotizar -->
+    <xs:element name="cotizarRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="distancia_km" type="xs:decimal"/>
+                <xs:element name="tipo_servicio" type="xs:string"/>
+                <xs:element name="num_pasajeros" type="xs:int" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="cotizarResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="precio_total" type="xs:decimal"/>
+                <xs:element name="precio_unitario" type="xs:decimal"/>
+                <xs:element name="zona" type="xs:string"/>
+                <xs:element name="mensaje" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Reservar -->
+    <xs:element name="reservarRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="origen" type="xs:string"/>
+                <xs:element name="lat_origen" type="xs:decimal" minOccurs="0"/>
+                <xs:element name="lng_origen" type="xs:decimal" minOccurs="0"/>
+                <xs:element name="destino" type="xs:string"/>
+                <xs:element name="lat_destino" type="xs:decimal" minOccurs="0"/>
+                <xs:element name="lng_destino" type="xs:decimal" minOccurs="0"/>
+                <xs:element name="referencia" type="xs:string" minOccurs="0"/>
+                <xs:element name="tipo_servicio" type="xs:string"/>
+                <xs:element name="duracion_minutos" type="xs:int" minOccurs="0"/>
+                <xs:element name="distancia" type="xs:decimal" minOccurs="0"/>
+                <xs:element name="fecha_viaje" type="xs:string" minOccurs="0"/>
+                <xs:element name="tarifa" type="xs:decimal" minOccurs="0"/>
+                <xs:element name="num_pasajeros" type="xs:int" minOccurs="0"/>
+                <xs:element name="chofer_id" type="xs:long" minOccurs="0"/>
+                <xs:element name="cliente_id" type="xs:long" minOccurs="0"/>
+                <xs:element name="asientos" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="reservarResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="viaje_id" type="xs:long"/>
+                <xs:element name="monto_total" type="xs:decimal"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Mis Viajes -->
+    <xs:element name="getMisViajesRequest">
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getMisViajesResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="viajes" type="tns:viajeSoapType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Viaje Activo -->
+    <xs:element name="getViajeActivoRequest">
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getViajeActivoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="viaje" type="tns:viajeSoapType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Asientos Ocupados -->
+    <xs:element name="getAsientosOcupadosRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="viaje_id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getAsientosOcupadosResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="asientos" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Calificar -->
+    <xs:element name="calificarRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="viaje_id" type="xs:long"/>
+                <xs:element name="estrellas" type="xs:int"/>
+                <xs:element name="comentario" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="calificarResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="calificacion_id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Validar Abordaje -->
+    <xs:element name="validarAbordajeRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="viaje_id" type="xs:long"/>
+                <xs:element name="codigo" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="validarAbordajeResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="mensaje" type="xs:string"/>
+                <xs:element name="estado" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Cancelar -->
+    <xs:element name="cancelarViajeRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="viaje_id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="cancelarViajeResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="mensaje" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
