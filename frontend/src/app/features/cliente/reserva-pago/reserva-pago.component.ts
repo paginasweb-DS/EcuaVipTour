@@ -46,10 +46,13 @@ export class ReservaPagoComponent implements OnInit, OnDestroy {
             if (viaje) {
               this.reservaParams.origen = viaje.origen;
               this.reservaParams.destino = viaje.destino;
-              this.reservaParams.tarifa = viaje.tarifa;
+              this.reservaParams.tarifa = viaje.tarifa || viaje.monto;
               this.reservaParams.tipo = viaje.tipo_servicio;
-              this.reservaParams.pasajeros = viaje.num_pasajeros;
-              this.reservaParams.hora = viaje.fecha_viaje;
+              this.reservaParams.pasajeros = viaje.num_pasajeros || (viaje.asientos && viaje.asientos.length) || 1;
+              this.reservaParams.hora = viaje.fecha_viaje || viaje.fecha;
+              if (viaje.asientos) {
+                this.reservaParams.asientos = Array.isArray(viaje.asientos) ? JSON.stringify(viaje.asientos) : viaje.asientos;
+              }
               
               if (viaje.fecha_limite_pago) {
                 this.startCountdown(viaje.fecha_limite_pago);
