@@ -159,6 +159,7 @@ export type ChartOptions = {
               [series]="revenueChartOptions.series"
               [chart]="revenueChartOptions.chart"
               [xaxis]="revenueChartOptions.xaxis"
+              [yaxis]="revenueChartOptions.yaxis"
               [dataLabels]="revenueChartOptions.dataLabels"
               [grid]="revenueChartOptions.grid"
               [stroke]="revenueChartOptions.stroke"
