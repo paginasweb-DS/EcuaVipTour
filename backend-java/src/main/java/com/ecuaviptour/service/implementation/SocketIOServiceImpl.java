@@ -498,9 +498,65 @@ public class SocketIOServiceImpl implements SocketIOService {
 
         try {
             server.getRoomOperations("choferes").sendEvent("nuevo_viaje_disponible", payload);
-            System.out.println("[Socket.IO] Emitido 'nuevo_viaje_disponible' para choferes. Viaje ID: " + v.getId());
+             System.out.println("[Socket.IO] Emitido 'nuevo_viaje_disponible' para choferes. Viaje ID: " + v.getId());
         } catch (Exception e) {
             System.err.println("[Socket.IO ERROR] Fallo al emitir 'nuevo_viaje_disponible': " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void broadcastViajeAceptadoAut(Viaje v) {
+        if (v == null || v.getChofer() == null) return;
+        Long viajeId = v.getId();
+        Long choferId = v.getChofer().getId();
+        Usuario chofer = v.getChofer();
+
+        try {
+            // Broadcast that this trip has been taken to all other drivers
+            server.getRoomOperations("choferes").sendEvent("viaje_ya_tomado", Map.of(
+                    "viaje_id", viajeId,
+                    "chofer_id", choferId,
+                    "mensaje", "Lo sentimos, este viaje ya fue aceptado por otro chofer."
+            ));
+
+            // Notify the specific driver so they immediately see the trip as accepted/active
+            server.getRoomOperations("chofer_" + choferId).sendEvent("viaje_confirmado_chofer", Map.of(
+                    "viaje_id", viajeId,
+                    "mensaje", "¡Viaje asignado con éxito!"
+            ));
+
+            Map<String, Object> choferAsignadoPayload = new HashMap<>();
+            choferAsignadoPayload.put("viaje_id", viajeId);
+            choferAsignadoPayload.put("chofer_id", choferId);
+            choferAsignadoPayload.put("nombre_chofer", chofer.getNombre());
+            choferAsignadoPayload.put("estado", "aceptado");
+            choferAsignadoPayload.put("foto_chofer_url", chofer.getFotoPerfilUrl());
+
+            Vehiculo veh = v.getVehiculo();
+            if (veh != null) {
+                choferAsignadoPayload.put("vehiculo", Map.of(
+                        "placa", veh.getPlaca() != null ? veh.getPlaca() : "",
+                        "marca", veh.getMarca() != null ? veh.getMarca() : "",
+                        "modelo", veh.getModelo() != null ? veh.getModelo() : "",
+                        "tipo", veh.getTipoVehiculo() != null ? veh.getTipoVehiculo() : "",
+                        "foto_auto_url", veh.getFotoAutoUrl() != null ? veh.getFotoAutoUrl() : ""
+                ));
+            } else {
+                choferAsignadoPayload.put("vehiculo", null);
+            }
+
+            if (v.getCliente() != null) {
+                server.getRoomOperations("cliente_" + v.getCliente().getId()).sendEvent("chofer_asignado", choferAsignadoPayload);
+            }
+
+            server.getRoomOperations("admins").sendEvent("viaje_actualizado_admin", Map.of(
+                    "viaje_id", viajeId,
+                    "estado", "aceptado"
+            ));
+
+            System.out.println("[Socket.IO] Emitida auto-asignacion y aceptacion para viaje " + viajeId);
+        } catch (Exception e) {
+            System.err.println("[Socket.IO ERROR] Fallo al emitir auto-asignacion: " + e.getMessage());
         }
     }
 

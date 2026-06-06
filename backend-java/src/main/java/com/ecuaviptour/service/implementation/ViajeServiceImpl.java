@@ -280,8 +280,17 @@ public class ViajeServiceImpl implements ViajeService {
             }
         }
 
-        viaje.setEstadoPago("pendiente");
-        viaje.setEstadoLogistico("pendiente");
+        if ("aprobado".equalsIgnoreCase(viaje.getEstadoPago())) {
+            viaje.setEstadoPago("aprobado");
+            if (choferId != null) {
+                viaje.setEstadoLogistico("aceptado");
+            } else {
+                viaje.setEstadoLogistico("buscando_chofer");
+            }
+        } else {
+            viaje.setEstadoPago("pendiente");
+            viaje.setEstadoLogistico("pendiente");
+        }
         viaje.setFechaCreacion(LocalDateTime.now());
         viaje.setFechaLimitePago(LocalDateTime.now().plusMinutes(15)); // 15 minutes limit to pay after quoting/reserving
 
@@ -294,7 +303,7 @@ public class ViajeServiceImpl implements ViajeService {
                     .cliente(cliente)
                     .numeroAsiento(seat)
                     .fechaReserva(LocalDateTime.now())
-                    .estado("pendiente")
+                    .estado("aprobado".equalsIgnoreCase(viaje.getEstadoPago()) ? "confirmado" : "pendiente")
                     .build();
             reservaAsientoRepository.save(res);
         }

@@ -138,6 +138,9 @@ public class ViajesSoapEndpoint {
                 .duracionMinutos(request.getDuracionMinutos() != null ? request.getDuracionMinutos() : 30)
                 .distanciaKm(request.getDistancia() != null ? request.getDistancia() : BigDecimal.ZERO)
                 .build();
+        if (request.getEstadoPago() != null && !request.getEstadoPago().isEmpty()) {
+            viaje.setEstadoPago(request.getEstadoPago());
+        }
 
         if (request.getFechaViaje() != null && !request.getFechaViaje().isEmpty()) {
             try {
@@ -150,6 +153,29 @@ public class ViajesSoapEndpoint {
         }
 
         Viaje saved = viajeService.reservar(viaje, seats, clienteId, choferId, numPasajeros, tarifa);
+
+        if ("aprobado".equalsIgnoreCase(saved.getEstadoPago())) {
+            // Generate TicketQR if approved
+            TicketQR ticket = ticketQRRepository.findByViajeId(saved.getId()).orElse(null);
+            if (ticket == null) {
+                ticket = TicketQR.builder()
+                        .viaje(saved)
+                        .codigoHash(UUID.randomUUID().toString())
+                        .estado("generado")
+                        .build();
+                ticketQRRepository.save(ticket);
+            }
+
+            // Emit socket updates
+            if (saved.getCliente() != null) {
+                socketIOService.broadcastPagoActualizado(saved.getId(), saved.getCliente().getId(), "aprobado", saved.getEstadoLogistico());
+            }
+            if (saved.getChofer() != null) {
+                socketIOService.broadcastViajeAceptadoAut(saved);
+            } else {
+                socketIOService.broadcastNuevoViajeDisponible(saved);
+            }
+        }
 
         ReservarResponse response = new ReservarResponse();
         response.setMessage("Viaje reservado con éxito");

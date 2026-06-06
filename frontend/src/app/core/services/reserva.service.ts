@@ -45,6 +45,7 @@ export class ReservaService {
         num_pasajeros: datosViaje.num_pasajeros || datosViaje.pasajeros,
         chofer_id: datosViaje.chofer_id,
         cliente_id: datosViaje.cliente_id,
+        estado_pago: datosViaje.estado_pago,
         asientos: asientosArray.length > 0 ? asientosArray : undefined
       },
       this.authService.getToken() || undefined

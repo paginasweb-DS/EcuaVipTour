@@ -313,8 +313,20 @@ public class AdminSoapEndpoint {
 
         Viaje v = pago.getViaje();
         v.setEstadoPago("aprobado");
-        v.setEstadoLogistico("buscando_chofer");
+        boolean autoAceptado = v.getChofer() != null;
+        if (autoAceptado) {
+            v.setEstadoLogistico("aceptado");
+        } else {
+            v.setEstadoLogistico("buscando_chofer");
+        }
         viajeRepository.save(v);
+
+        // Confirm seat reservations
+        List<ReservaAsiento> seats = reservaAsientoRepository.findByViajeId(v.getId());
+        for (ReservaAsiento seat : seats) {
+            seat.setEstado("confirmado");
+            reservaAsientoRepository.save(seat);
+        }
 
         // Generate TicketQR if not exists
         TicketQR ticket = ticketQRRepository.findByViajeId(v.getId()).orElse(null);
@@ -328,13 +340,18 @@ public class AdminSoapEndpoint {
         }
 
         if (v.getCliente() != null) {
-            socketIOService.broadcastPagoActualizado(v.getId(), v.getCliente().getId(), "aprobado", "buscando_chofer");
+            socketIOService.broadcastPagoActualizado(v.getId(), v.getCliente().getId(), "aprobado", v.getEstadoLogistico());
         }
-        socketIOService.broadcastNuevoViajeDisponible(v);
+
+        if (autoAceptado) {
+            socketIOService.broadcastViajeAceptadoAut(v);
+        } else {
+            socketIOService.broadcastNuevoViajeDisponible(v);
+        }
 
         AprobarPagoResponse response = new AprobarPagoResponse();
         response.setSuccess(true);
-        response.setMessage("Pago aprobado, buscando chofer");
+        response.setMessage(autoAceptado ? "Pago aprobado, viaje auto-aceptado por chofer" : "Pago aprobado, buscando chofer");
         return response;
     }
 

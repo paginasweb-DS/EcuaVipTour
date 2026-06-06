@@ -15,6 +15,8 @@ public interface SocketIOService {
     
     void broadcastNuevoViajeDisponible(Viaje v);
     
+    void broadcastViajeAceptadoAut(Viaje v);
+    
     void broadcastPagoActualizado(Long viajeId, Long clienteId, String estadoPago, String estadoLogistico);
 
     void broadcastNuevoComprobante(Long viajeId, Long clienteId);
