@@ -374,6 +374,12 @@ export class MonitorFlotaComponent implements OnInit {
           style: { colors: '#94a3b8', fontWeight: 600 }
         }
       },
+      yaxis: {
+        labels: {
+          formatter: (val: number) => `$${val.toFixed(2)}`,
+          style: { colors: '#94a3b8', fontWeight: 600 }
+        }
+      },
       grid: {
         borderColor: '#f1f5f9',
         strokeDashArray: 4,
