@@ -80,6 +80,7 @@ export const routes: Routes = [
       { path: 'vehiculos', loadComponent: () => import('./features/admin/gestion-vehiculos/gestion-vehiculos.component').then(m => m.GestionVehiculosComponent) },
       { path: 'usuarios', loadComponent: () => import('./features/admin/usuarios/usuarios.component').then(m => m.UsuariosComponent) },
       { path: 'reservas', loadComponent: () => import('./features/admin/reservas/reservas.component').then(m => m.ReservasComponent) },
+      { path: 'gastos', loadComponent: () => import('./features/admin/gastos/gastos.component').then(m => m.GastosComponent) },
       { path: 'perfil', loadComponent: () => import('./features/cliente/perfil/perfil.component').then(m => m.PerfilComponent) },
       { path: '', redirectTo: 'monitor', pathMatch: 'full' }
     ]

@@ -1,8 +1,8 @@
 package com.ecuaviptour.soap.endpoint;
 
-import com.ecuaviptour.model.Usuario;
-import com.ecuaviptour.repository.UsuarioRepository;
-import com.ecuaviptour.service.interfaces.AuthService;
+import com.ecuaviptour.modules.users.domain.Usuario;
+import com.ecuaviptour.modules.users.repository.UsuarioRepository;
+import com.ecuaviptour.modules.users.service.AuthService;
 import com.ecuaviptour.soap.auth.*;
 import com.ecuaviptour.util.JwtUtil;
 import com.ecuaviptour.exception.ResourceNotFoundException;

@@ -1,8 +1,8 @@
 package com.ecuaviptour.soap.endpoint;
 
-import com.ecuaviptour.model.Pago;
-import com.ecuaviptour.service.interfaces.PagoService;
-import com.ecuaviptour.service.interfaces.SocketIOService;
+import com.ecuaviptour.modules.pagos.domain.Pago;
+import com.ecuaviptour.modules.pagos.service.PagoService;
+import com.ecuaviptour.shared.service.SocketIOService;
 import com.ecuaviptour.soap.pagos.SubirComprobanteRequest;
 import com.ecuaviptour.soap.pagos.SubirComprobanteResponse;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;

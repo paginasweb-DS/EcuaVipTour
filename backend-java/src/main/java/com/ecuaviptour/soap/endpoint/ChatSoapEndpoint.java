@@ -1,11 +1,17 @@
 package com.ecuaviptour.soap.endpoint;
 
-import com.ecuaviptour.model.MensajeChat;
-import com.ecuaviptour.model.Usuario;
-import com.ecuaviptour.repository.MensajeRepository;
-import com.ecuaviptour.repository.UsuarioRepository;
-import com.ecuaviptour.service.interfaces.ChatService;
-import com.ecuaviptour.service.interfaces.SocketIOService;
+import com.ecuaviptour.modules.chat.service.ChatService;
+
+import com.ecuaviptour.modules.chat.repository.MensajeRepository;
+
+import com.ecuaviptour.modules.chat.domain.MensajeChat;
+
+import com.ecuaviptour.modules.chat.domain.MensajeChat;
+import com.ecuaviptour.modules.users.domain.Usuario;
+import com.ecuaviptour.modules.chat.repository.MensajeRepository;
+import com.ecuaviptour.modules.users.repository.UsuarioRepository;
+import com.ecuaviptour.modules.chat.service.ChatService;
+import com.ecuaviptour.shared.service.SocketIOService;
 import com.ecuaviptour.soap.chat.*;
 import com.ecuaviptour.exception.ResourceNotFoundException;
 import com.ecuaviptour.exception.UnauthorizedException;

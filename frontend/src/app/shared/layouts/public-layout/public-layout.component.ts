@@ -44,6 +44,8 @@ import { Subscription } from 'rxjs';
     <!-- Modal de Autenticación Global -->
     <app-auth-modal
       *ngIf="showAuthModal"
+      [isLogin]="authModalIsLogin"
+      [initialRol]="authModalRol"
       (onClose)="showAuthModal = false"
       (onSuccess)="handleAuthSuccess()">
     </app-auth-modal>
@@ -51,11 +53,15 @@ import { Subscription } from 'rxjs';
 })
 export class PublicLayoutComponent {
   showAuthModal = false;
+  authModalIsLogin = true;
+  authModalRol = 'cliente';
   isSidebarOpen = true;
   private authSub: Subscription;
 
   constructor(private authService: AuthService) {
-    this.authSub = this.authService.authModal$.subscribe(() => {
+    this.authSub = this.authService.authModal$.subscribe((options) => {
+      this.authModalIsLogin = options?.isLogin !== false;
+      this.authModalRol = options?.rol || 'cliente';
       this.showAuthModal = true;
     });
   }

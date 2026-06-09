@@ -1,10 +1,12 @@
 package com.ecuaviptour.soap.endpoint;
 
-import com.ecuaviptour.model.Vehiculo;
-import com.ecuaviptour.model.Usuario;
-import com.ecuaviptour.service.interfaces.DriverService;
-import com.ecuaviptour.service.interfaces.ViajeService;
-import com.ecuaviptour.repository.UsuarioRepository;
+import com.ecuaviptour.modules.viajes.service.ViajeService;
+
+import com.ecuaviptour.modules.vehiculos.domain.Vehiculo;
+import com.ecuaviptour.modules.users.domain.Usuario;
+import com.ecuaviptour.modules.users.service.DriverService;
+import com.ecuaviptour.modules.viajes.service.ViajeService;
+import com.ecuaviptour.modules.users.repository.UsuarioRepository;
 import com.ecuaviptour.soap.chofer.*;
 import com.ecuaviptour.exception.UnauthorizedException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -225,6 +227,7 @@ public class ChoferSoapEndpoint {
             s.setTipoServicio(v.getTipoServicio());
             s.setFecha(v.getFechaCreacion() != null ? v.getFechaCreacion().toString() : "");
             s.setCliente(v.getCliente() != null ? v.getCliente().getNombre() : "N/A");
+            s.setClienteId(v.getCliente() != null ? v.getCliente().getId() : null);
             s.setEstadoLogistico(v.getEstadoLogistico());
             response.getViajes().add(s);
         });

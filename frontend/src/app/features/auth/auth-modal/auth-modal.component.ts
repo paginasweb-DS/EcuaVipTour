@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
@@ -9,11 +9,13 @@ import { AuthService } from '../../../core/services/auth.service';
   imports: [CommonModule, FormsModule],
   templateUrl: './auth-modal.component.html'
 })
-export class AuthModalComponent {
+export class AuthModalComponent implements OnInit {
   @Output() onSuccess = new EventEmitter<void>();
   @Output() onClose = new EventEmitter<void>();
 
-  isLogin = true;
+  @Input() isLogin = true;
+  @Input() initialRol = 'cliente';
+
   formData = {
     correo: '',
     password: '',
@@ -22,6 +24,10 @@ export class AuthModalComponent {
     cedula: '',
     rol: 'cliente'
   };
+
+  ngOnInit() {
+    this.formData.rol = this.initialRol;
+  }
   
   error = '';
   loading = false;

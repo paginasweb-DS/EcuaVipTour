@@ -1,82 +1,82 @@
 <!-- MODAL OVERLAY CON Z-INDEX ABSOLUTO -->
-<div class="fixed inset-0 flex items-center justify-center p-4 bg-gray-900/90 backdrop-blur-md animate-fade-in" style="z-index: 999999 !important;">
+<div class="fixed inset-0 overflow-y-auto bg-gray-900/90 backdrop-blur-md animate-fade-in flex justify-center items-start p-4 py-6 sm:py-8" style="z-index: 999999 !important;">
   
   <!-- MODAL CONTAINER -->
-  <div class="bg-white rounded-[3rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6)] w-full max-w-lg p-10 border border-white/20 transform transition-all relative overflow-hidden animate-slide-up">
+  <div class="bg-white rounded-[2rem] sm:rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6)] w-full max-w-md p-6 sm:py-7 sm:px-8 border border-white/20 transform transition-all relative animate-slide-up my-auto">
     
     <!-- Cerrar -->
-    <button (click)="closeModal()" class="absolute top-8 right-8 text-gray-400 hover:text-gray-900 transition-all hover:rotate-90 z-20">
-      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    <button (click)="closeModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-all hover:rotate-90 z-20">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
     </button>
 
-    <div class="text-center mb-10 relative z-10">
-      <div class="w-16 h-16 bg-blue-50 text-ecuavip-blue rounded-[1.5rem] flex items-center justify-center mx-auto mb-4 border border-blue-100 shadow-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <div class="text-center mb-5 relative z-10">
+      <div class="w-12 h-12 bg-blue-50 text-ecuavip-blue rounded-xl flex items-center justify-center mx-auto mb-2 border border-blue-100 shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
-      <h2 class="text-3xl font-black text-gray-900 tracking-tight">{{ isLogin ? 'Bienvenido' : 'Crea tu Cuenta' }}</h2>
-      <p class="text-sm text-gray-500 font-medium mt-2">Vive la experiencia Ecuavip VIP</p>
+      <h2 class="text-2xl font-black text-gray-900 tracking-tight">{{ isLogin ? 'Bienvenido' : 'Crea tu Cuenta' }}</h2>
+      <p class="text-xs text-gray-500 font-medium mt-1">Vive la experiencia Ecuavip VIP</p>
     </div>
 
-    <div *ngIf="error" class="bg-red-50 text-red-600 text-xs font-black p-4 rounded-2xl mb-6 border border-red-100 text-center uppercase tracking-widest relative z-10">
+    <div *ngIf="error" class="bg-red-50 text-red-600 text-[10px] font-black p-3 rounded-xl mb-4 border border-red-100 text-center uppercase tracking-widest relative z-10">
       {{ error }}
     </div>
 
-    <form (ngSubmit)="onSubmit()" class="space-y-6 relative z-10">
+    <form (ngSubmit)="onSubmit()" class="space-y-4 relative z-10">
       <!-- ROL SELECTION -->
-      <div *ngIf="!isLogin" class="pb-2">
-        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 text-center">Tipo de Cuenta</label>
-        <div class="grid grid-cols-2 gap-4">
+      <div *ngIf="!isLogin" class="pb-1">
+        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 text-center">Tipo de Cuenta</label>
+        <div class="grid grid-cols-2 gap-3">
           <button 
             type="button"
             (click)="formData.rol = 'cliente'"
-            [ngClass]="formData.rol === 'cliente' ? 'bg-blue-600 text-white border-blue-600 scale-105 shadow-xl' : 'bg-white text-gray-500 border-gray-100 hover:border-blue-500 hover:bg-blue-50/50'"
-            class="flex flex-col items-center gap-3 p-6 border-2 rounded-[2rem] transition-all duration-300 group"
+            [ngClass]="formData.rol === 'cliente' ? 'bg-blue-600 text-white border-blue-600 scale-102 shadow-lg' : 'bg-white text-gray-500 border-gray-100 hover:border-blue-500 hover:bg-blue-50/50'"
+            class="flex flex-col items-center gap-2 p-3 border-2 rounded-xl transition-all duration-300 group"
           >
-            <div [ngClass]="formData.rol === 'cliente' ? 'bg-white/20' : 'bg-gray-100'" class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors">
-              <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <div [ngClass]="formData.rol === 'cliente' ? 'bg-white/20' : 'bg-gray-100'" class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
-            <span class="text-[10px] font-black uppercase tracking-widest">Soy Cliente</span>
+            <span class="text-[9px] font-black uppercase tracking-widest">Soy Cliente</span>
           </button>
 
           <button 
             type="button"
             (click)="formData.rol = 'chofer'"
-            [ngClass]="formData.rol === 'chofer' ? 'bg-blue-600 text-white border-blue-600 scale-105 shadow-xl' : 'bg-white text-gray-500 border-gray-100 hover:border-blue-500 hover:bg-blue-50/50'"
-            class="flex flex-col items-center gap-3 p-6 border-2 rounded-[2rem] transition-all duration-300 group"
+            [ngClass]="formData.rol === 'chofer' ? 'bg-blue-600 text-white border-blue-600 scale-102 shadow-lg' : 'bg-white text-gray-500 border-gray-100 hover:border-blue-500 hover:bg-blue-50/50'"
+            class="flex flex-col items-center gap-2 p-3 border-2 rounded-xl transition-all duration-300 group"
           >
-            <div [ngClass]="formData.rol === 'chofer' ? 'bg-white/20' : 'bg-gray-100'" class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors">
-              <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></svg>
+            <div [ngClass]="formData.rol === 'chofer' ? 'bg-white/20' : 'bg-gray-100'" class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></svg>
             </div>
-            <span class="text-[10px] font-black uppercase tracking-widest">Soy Chofer</span>
+            <span class="text-[9px] font-black uppercase tracking-widest">Soy Chofer</span>
           </button>
         </div>
       </div>
 
-      <div class="space-y-4">
+      <div class="space-y-2.5">
         <div *ngIf="!isLogin">
-          <input type="text" [(ngModel)]="formData.nombre" name="nombre" class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all" placeholder="Nombre Completo">
+          <input type="text" [(ngModel)]="formData.nombre" name="nombre" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all" placeholder="Nombre Completo">
         </div>
         <div>
-          <input type="email" [(ngModel)]="formData.correo" name="correo" class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all" placeholder="Correo Electrónico">
+          <input type="email" [(ngModel)]="formData.correo" name="correo" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all" placeholder="Correo Electrónico">
         </div>
         <div *ngIf="!isLogin">
-          <input type="text" [(ngModel)]="formData.cedula" name="cedula" class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all" placeholder="Número de Cédula">
+          <input type="text" [(ngModel)]="formData.cedula" name="cedula" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all" placeholder="Número de Cédula">
         </div>
         <div *ngIf="!isLogin">
-          <input type="text" [(ngModel)]="formData.telefono" name="telefono" class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all" placeholder="Teléfono Móvil">
+          <input type="text" [(ngModel)]="formData.telefono" name="telefono" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all" placeholder="Teléfono Móvil">
         </div>
         <div>
-          <input type="password" [(ngModel)]="formData.password" name="password" class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all" placeholder="Contraseña">
+          <input type="password" [(ngModel)]="formData.password" name="password" class="w-full bg-gray-50 border-2 border-gray-100 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-blue-500 focus:bg-white transition-all" placeholder="Contraseña">
         </div>
       </div>
 
-      <button type="submit" [disabled]="loading" class="w-full bg-blue-600 text-white font-black py-5 rounded-[1.5rem] shadow-xl shadow-blue-600/30 hover:bg-gray-900 hover:-translate-y-1 transition-all disabled:opacity-50 uppercase tracking-[0.2em] text-xs">
+      <button type="submit" [disabled]="loading" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-600/20 hover:bg-gray-900 hover:-translate-y-0.5 transition-all disabled:opacity-50 uppercase tracking-[0.2em] text-[10px]">
         {{ loading ? 'Sincronizando...' : (isLogin ? 'Entrar Ahora' : 'Crear Cuenta VIP') }}
       </button>
     </form>
 
-    <div class="mt-8 text-center pt-6 border-t border-gray-50 relative z-10">
-      <p class="text-sm text-gray-500 font-medium">
+    <div class="mt-5 text-center pt-4 border-t border-gray-50 relative z-10">
+      <p class="text-xs text-gray-500 font-medium">
         {{ isLogin ? '¿Nuevo en Ecuavip?' : '¿Ya eres miembro?' }}
         <button type="button" (click)="toggleMode()" class="text-blue-600 font-black hover:underline ml-1">
           {{ isLogin ? 'Regístrate aquí' : 'Inicia Sesión' }}

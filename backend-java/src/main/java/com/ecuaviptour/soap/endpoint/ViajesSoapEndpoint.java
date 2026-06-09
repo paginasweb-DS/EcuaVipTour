@@ -1,10 +1,38 @@
 package com.ecuaviptour.soap.endpoint;
 
-import com.ecuaviptour.model.*;
-import com.ecuaviptour.repository.*;
-import com.ecuaviptour.service.interfaces.CalificacionService;
-import com.ecuaviptour.service.interfaces.SocketIOService;
-import com.ecuaviptour.service.interfaces.ViajeService;
+import com.ecuaviptour.modules.users.repository.CalificacionRepository;
+
+import com.ecuaviptour.modules.users.domain.Calificacion;
+
+import com.ecuaviptour.modules.viajes.service.ViajeService;
+
+import com.ecuaviptour.modules.viajes.repository.TicketQRRepository;
+
+import com.ecuaviptour.modules.viajes.repository.ReservaAsientoRepository;
+
+import com.ecuaviptour.modules.viajes.repository.ViajeRepository;
+
+import com.ecuaviptour.modules.viajes.domain.TicketQR;
+
+import com.ecuaviptour.modules.viajes.domain.ReservaAsiento;
+
+import com.ecuaviptour.modules.viajes.domain.Viaje;
+
+import com.ecuaviptour.modules.viajes.repository.ViajeRepository;
+
+import com.ecuaviptour.modules.viajes.domain.Viaje;
+
+import com.ecuaviptour.modules.users.repository.UsuarioRepository;
+
+import com.ecuaviptour.modules.users.domain.Usuario;
+
+import com.ecuaviptour.modules.vehiculos.repository.VehiculoRepository;
+
+import com.ecuaviptour.modules.vehiculos.domain.Vehiculo;
+
+import com.ecuaviptour.modules.users.service.CalificacionService;
+import com.ecuaviptour.shared.service.SocketIOService;
+import com.ecuaviptour.modules.viajes.service.ViajeService;
 import com.ecuaviptour.soap.viajes.*;
 import com.ecuaviptour.exception.ResourceNotFoundException;
 import com.ecuaviptour.exception.UnauthorizedException;

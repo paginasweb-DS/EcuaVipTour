@@ -12,7 +12,7 @@ export class AuthService {
   private namespace = 'http://ecuaviptour.com/soap/auth';
   private isBrowser: boolean;
   
-  private authModalSubject = new Subject<void>();
+  private authModalSubject = new Subject<{ isLogin?: boolean, rol?: string } | void>();
   authModal$ = this.authModalSubject.asObservable();
 
   constructor(
@@ -156,7 +156,7 @@ export class AuthService {
     }
   }
 
-  openAuthModal(): void {
-    this.authModalSubject.next();
+  openAuthModal(options?: { isLogin?: boolean, rol?: string }): void {
+    this.authModalSubject.next(options);
   }
 }

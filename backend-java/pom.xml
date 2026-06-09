@@ -128,7 +128,7 @@
                 </executions>
                 <configuration>
                     <sources>
-                        <source>${project.basedir}/src/main/resources/xsd</source>
+                        <source>${project.basedir}/src/main/resources/soap/xsd</source>
                     </sources>
                     <outputDirectory>${project.build.directory}/generated-sources/jaxb</outputDirectory>
                     <clearOutputDir>false</clearOutputDir>

@@ -174,7 +174,7 @@ export class SoapService {
     }
 
     const obj: any = {};
-    const pluralTags = ['viajes', 'pagos', 'chats', 'usuarios', 'messages', 'asientos', 'vehiculos'];
+    const pluralTags = ['viajes', 'pagos', 'chats', 'usuarios', 'messages', 'asientos', 'vehiculos', 'gastos'];
 
     for (let i = 0; i < node.childNodes.length; i++) {
       const child = node.childNodes[i] as Element;

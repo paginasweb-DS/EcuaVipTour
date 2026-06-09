@@ -1,10 +1,38 @@
 package com.ecuaviptour.soap.endpoint;
 
-import com.ecuaviptour.model.*;
-import com.ecuaviptour.repository.*;
-import com.ecuaviptour.service.interfaces.AdminService;
-import com.ecuaviptour.service.interfaces.PagoService;
-import com.ecuaviptour.service.interfaces.SocketIOService;
+import com.ecuaviptour.modules.viajes.repository.TicketQRRepository;
+
+import com.ecuaviptour.modules.viajes.repository.ReservaAsientoRepository;
+
+import com.ecuaviptour.modules.viajes.repository.ViajeRepository;
+
+import com.ecuaviptour.modules.viajes.domain.TicketQR;
+
+import com.ecuaviptour.modules.viajes.domain.ReservaAsiento;
+
+import com.ecuaviptour.modules.viajes.domain.Viaje;
+
+import com.ecuaviptour.modules.chat.repository.MensajeRepository;
+
+import com.ecuaviptour.modules.chat.domain.MensajeChat;
+
+import com.ecuaviptour.modules.viajes.repository.ViajeRepository;
+
+import com.ecuaviptour.modules.viajes.domain.Viaje;
+
+import com.ecuaviptour.modules.users.repository.UsuarioRepository;
+
+import com.ecuaviptour.modules.users.domain.Usuario;
+
+import com.ecuaviptour.modules.pagos.repository.PagoRepository;
+
+import com.ecuaviptour.modules.pagos.domain.Pago;
+
+import com.ecuaviptour.modules.vehiculos.domain.Vehiculo;
+
+import com.ecuaviptour.modules.users.service.AdminService;
+import com.ecuaviptour.modules.pagos.service.PagoService;
+import com.ecuaviptour.shared.service.SocketIOService;
 import com.ecuaviptour.soap.admin.*;
 import com.ecuaviptour.exception.ResourceNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://ecuaviptour.com/soap/gastos"
+           xmlns:tns="http://ecuaviptour.com/soap/gastos"
+           elementFormDefault="qualified">
+
+    <xs:complexType name="gastoSoapType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="monto" type="xs:double"/>
+            <xs:element name="fecha" type="xs:string"/>
+            <xs:element name="descripcion" type="xs:string"/>
+            <xs:element name="categoria" type="xs:string"/>
+            <xs:element name="admin_id" type="xs:long"/>
+            <xs:element name="admin_nombre" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Registrar Gasto -->
+    <xs:element name="registrarGastoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="monto" type="xs:double"/>
+                <xs:element name="descripcion" type="xs:string"/>
+                <xs:element name="categoria" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="registrarGastoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="success" type="xs:boolean"/>
+                <xs:element name="mensaje" type="xs:string"/>
+                <xs:element name="gasto" type="tns:gastoSoapType" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Listar Gastos -->
+    <xs:element name="getGastosRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="categoria" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getGastosResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="gastos" type="tns:gastoSoapType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Analítica de Gastos -->
+    <xs:element name="getGastoStatsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="period" type="xs:string" minOccurs="0"/>
+                <xs:element name="start_date" type="xs:string" minOccurs="0"/>
+                <xs:element name="end_date" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getGastoStatsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="stats_json" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

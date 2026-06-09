@@ -1,5 +1,9 @@
 package com.ecuaviptour.security;
 
+import com.ecuaviptour.modules.users.repository.UsuarioRepository;
+
+import com.ecuaviptour.modules.users.domain.Usuario;
+
 import com.ecuaviptour.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,9 +22,9 @@ import java.util.Collections;
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final com.ecuaviptour.repository.UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public JwtRequestFilter(JwtUtil jwtUtil, com.ecuaviptour.repository.UsuarioRepository usuarioRepository) {
+    public JwtRequestFilter(JwtUtil jwtUtil, UsuarioRepository usuarioRepository) {
         this.jwtUtil = jwtUtil;
         this.usuarioRepository = usuarioRepository;
     }
@@ -44,7 +48,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            com.ecuaviptour.model.Usuario u = null;
+            Usuario u = null;
             try {
                 Long userId = Long.parseLong(username);
                 u = usuarioRepository.findById(userId).orElse(null);

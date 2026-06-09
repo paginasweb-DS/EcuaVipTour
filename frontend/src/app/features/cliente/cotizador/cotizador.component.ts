@@ -5,6 +5,7 @@ import { GoogleMapsModule, MapDirectionsService } from '@angular/google-maps';
 import { MapService } from '../../../core/services/map.service';
 import { ViajeService, CotizacionResponse } from '../../../core/services/viaje.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ClienteService } from '../../../core/services/cliente.service';
 import { AuthModalComponent } from '../../auth/auth-modal/auth-modal.component';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -70,12 +71,41 @@ export class CotizadorComponent implements OnInit, OnDestroy {
     private mapService: MapService,
     private viajeService: ViajeService,
     private authService: AuthService,
+    private clienteService: ClienteService,
     private directionsService: MapDirectionsService,
     private ngZone: NgZone,
     private router: Router
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.checkActiveTrip();
+  }
+
+  checkActiveTrip() {
+    if (this.authService.isLoggedIn()) {
+      this.clienteService.getMisViajes().subscribe({
+        next: (viajes) => {
+          if (viajes && viajes.length > 0) {
+            const ultimoViaje = viajes[0];
+            if (ultimoViaje.estado_logistico !== 'finalizado' && ultimoViaje.estado_logistico !== 'cancelado') {
+              if (ultimoViaje.estado_pago === 'pendiente') {
+                this.router.navigate(['/cliente/reserva'], {
+                  queryParams: {
+                    viajeId: ultimoViaje.viaje_id || ultimoViaje.id
+                  }
+                });
+              } else {
+                this.router.navigate(['/cliente/en-curso']);
+              }
+            }
+          }
+        },
+        error: (err) => {
+          console.error('Error al verificar viaje activo:', err);
+        }
+      });
+    }
+  }
   ngOnDestroy() {
     if (this.cotizacionSub) this.cotizacionSub.unsubscribe();
   }
