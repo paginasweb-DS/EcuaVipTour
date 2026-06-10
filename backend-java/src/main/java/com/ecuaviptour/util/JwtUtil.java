@@ -18,6 +18,9 @@ public class JwtUtil {
     @Value("${jwt.secret:ecuavip-super-secret-key-123-extremely-secure-and-safe-32-chars}")
     private String secret;
 
+    @Value("${jwt.expiration:36000000}") // Default 10 hours in milliseconds
+    private long jwtExpirationMs;
+
     private Key getSigningKey() {
         byte[] keyBytes = this.secret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
@@ -25,6 +28,10 @@ public class JwtUtil {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -45,7 +52,7 @@ public class JwtUtil {
                 .setClaims(extraClaims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                // Tokens do not expire to match Python JWT configuration
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -58,8 +65,17 @@ public class JwtUtil {
         return generateToken(String.valueOf(userId), claims);
     }
 
+    private Boolean isTokenExpired(String token) {
+        try {
+            final Date expiration = extractExpiration(token);
+            return expiration.before(new Date());
+        } catch (Exception e) {
+            return true; // If parsing expiration fails, treat it as expired
+        }
+    }
+
     public Boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username));
+        return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
 }
