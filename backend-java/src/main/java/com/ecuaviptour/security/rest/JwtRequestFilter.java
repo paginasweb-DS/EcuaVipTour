@@ -36,16 +36,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         final String authorizationHeader = request.getHeader("Authorization");
 
-        String username = null;
-        String jwt = null;
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
-            try {
-                username = jwtUtil.extractUsername(jwt);
-            } catch (Exception e) {
-                logger.warn("JWT token parsing failed: " + e.getMessage());
-            }
+        String jwt = authorizationHeader.substring(7).trim();
+
+        if (jwt.isBlank() || "null".equalsIgnoreCase(jwt) || "undefined".equalsIgnoreCase(jwt) || jwt.split("\\.").length != 3) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String username = null;
+        try {
+            username = jwtUtil.extractUsername(jwt);
+        } catch (Exception e) {
+            logger.warn("JWT token parsing failed: " + e.getMessage());
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

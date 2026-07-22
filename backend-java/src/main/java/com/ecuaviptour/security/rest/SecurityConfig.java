@@ -12,8 +12,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
@@ -42,7 +44,13 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.OPTIONS, "/**")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/**")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/api/cotizar")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/ws/**")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/uploads/**")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher("/archivos/**")).permitAll()
+                .anyRequest().authenticated()
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

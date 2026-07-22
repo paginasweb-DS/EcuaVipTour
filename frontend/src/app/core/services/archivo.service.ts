@@ -24,7 +24,7 @@ export class ArchivoService {
 
     const token = this.authService.getToken();
     let headers = new HttpHeaders();
-    if (token) {
+    if (token && token !== 'null' && token !== 'undefined' && token.split('.').length === 3) {
       headers = headers.set('Authorization', `Bearer ${token}`);
     }
 
