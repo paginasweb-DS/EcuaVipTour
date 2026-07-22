@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map, catchError, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SoapService {
-  private wsUrl = 'http://localhost:5001/ws';
+  private wsUrl = `${environment.apiUrl}/ws`;
 
   constructor(private http: HttpClient) {}
 

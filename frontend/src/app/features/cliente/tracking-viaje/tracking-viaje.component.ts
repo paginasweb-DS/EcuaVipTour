@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
@@ -19,6 +20,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './tracking-viaje.component.html'
 })
 export class TrackingViajeComponent implements OnInit, OnDestroy {
+  apiUrl = environment.apiUrl;
   viajeActual: any = null;
   historial: any[] = [];
   loading = true;

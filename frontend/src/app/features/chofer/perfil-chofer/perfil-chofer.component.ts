@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +15,7 @@ import { VehiculoComponent } from '../vehiculo/vehiculo.component';
   styleUrl: './perfil-chofer.component.css'
 })
 export class PerfilChoferComponent implements OnInit {
+  apiUrl = environment.apiUrl;
   usuario: any;
   isLoading = false;
   isEditing = false;

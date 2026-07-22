@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -232,7 +233,7 @@ import { QRCodeModule } from 'angularx-qrcode';
                   <div class="flex items-center gap-3">
                     <div class="relative shrink-0">
                       <div class="w-14 h-14 rounded-full overflow-hidden border-2 border-white shadow-md flex items-center justify-center bg-blue-600 text-white">
-                        <img *ngIf="selectedPackage.foto_chofer_url" [src]="'http://localhost:5001/' + selectedPackage.foto_chofer_url" class="w-full h-full object-cover rounded-full">
+                        <img *ngIf="selectedPackage.foto_chofer_url" [src]="(apiUrl + '/') + selectedPackage.foto_chofer_url" class="w-full h-full object-cover rounded-full">
                         <span *ngIf="!selectedPackage.foto_chofer_url" class="text-lg font-black uppercase">
                           {{ selectedPackage.nombre_chofer.charAt(0) }}
                         </span>
@@ -251,7 +252,7 @@ import { QRCodeModule } from 'angularx-qrcode';
                   <!-- Vehículo Info -->
                   <div *ngIf="selectedPackage.vehiculo" class="flex flex-col items-center gap-1.5 shrink-0">
                     <div class="w-20 h-12 bg-white rounded-xl overflow-hidden border border-blue-100 shadow-sm relative shrink-0">
-                      <img *ngIf="selectedPackage.vehiculo.foto_auto_url" [src]="'http://localhost:5001/' + selectedPackage.vehiculo.foto_auto_url" class="w-full h-full object-cover">
+                      <img *ngIf="selectedPackage.vehiculo.foto_auto_url" [src]="(apiUrl + '/') + selectedPackage.vehiculo.foto_auto_url" class="w-full h-full object-cover">
                       <div *ngIf="!selectedPackage.vehiculo.foto_auto_url" class="w-full h-full flex items-center justify-center text-blue-200">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.6C2.1 10.3 2 10.6 2 11v5c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
                       </div>
@@ -651,6 +652,7 @@ import { QRCodeModule } from 'angularx-qrcode';
   `]
 })
 export class RastreoComponent implements OnInit, OnDestroy, AfterViewInit {
+  apiUrl = environment.apiUrl;
   @ViewChild('origenInput') origenInput!: ElementRef<HTMLInputElement>;
   @ViewChild('destinoInput') destinoInput!: ElementRef<HTMLInputElement>;
 

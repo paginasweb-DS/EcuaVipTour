@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +15,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './validacion-pagos.component.html'
 })
 export class ValidacionPagosComponent implements OnInit, OnDestroy {
+  apiUrl = environment.apiUrl;
   pagos: any[] = [];
   loading = true;
   error = '';

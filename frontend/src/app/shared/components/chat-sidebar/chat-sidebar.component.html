@@ -21,7 +21,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       </div>
       <div *ngIf="estadoCaso === 'asignado' && soporteAsignado" class="w-12 h-12 rounded-full overflow-hidden bg-white/25 border border-white/20 shadow-md shrink-0 flex items-center justify-center font-bold">
-        <img *ngIf="soporteAsignado.fotoPerfilUrl" [src]="'http://localhost:5001/' + soporteAsignado.fotoPerfilUrl" class="w-full h-full object-cover">
+        <img *ngIf="soporteAsignado.fotoPerfilUrl" [src]="(apiUrl + '/') + soporteAsignado.fotoPerfilUrl" class="w-full h-full object-cover">
         <div *ngIf="!soporteAsignado.fotoPerfilUrl" class="w-full h-full bg-white/20 flex items-center justify-center font-black text-white uppercase text-base">
           {{ soporteAsignado.nombre.charAt(0) }}
         </div>
@@ -57,12 +57,12 @@
     <div class="flex items-center gap-3" *ngIf="tipoReceptor === 'chofer'">
       <!-- Client avatar (round) if current user is chofer -->
       <div *ngIf="miRol === 'chofer'" class="w-12 h-12 rounded-full overflow-hidden bg-white/20 flex items-center justify-center backdrop-blur-md shrink-0 shadow-md">
-        <img *ngIf="fotoPerfilUrl" [src]="fotoPerfilUrl.indexOf('http') === 0 ? fotoPerfilUrl : 'http://localhost:5001/' + fotoPerfilUrl" class="w-full h-full object-cover rounded-full">
+        <img *ngIf="fotoPerfilUrl" [src]="fotoPerfilUrl.indexOf('http') === 0 ? fotoPerfilUrl : (apiUrl + '/') + fotoPerfilUrl" class="w-full h-full object-cover rounded-full">
         <svg *ngIf="!fotoPerfilUrl" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
       <!-- Driver avatar (round) if current user is client -->
       <div *ngIf="miRol !== 'chofer'" class="w-12 h-12 rounded-full overflow-hidden bg-white/20 flex items-center justify-center backdrop-blur-md shrink-0 shadow-md">
-        <img *ngIf="fotoPerfilUrl" [src]="fotoPerfilUrl.indexOf('http') === 0 ? fotoPerfilUrl : 'http://localhost:5001/' + fotoPerfilUrl" class="w-full h-full object-cover rounded-full">
+        <img *ngIf="fotoPerfilUrl" [src]="fotoPerfilUrl.indexOf('http') === 0 ? fotoPerfilUrl : (apiUrl + '/') + fotoPerfilUrl" class="w-full h-full object-cover rounded-full">
         <svg *ngIf="!fotoPerfilUrl" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.6C2.1 10.3 2 10.6 2 11v5c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
       </div>
       <div>

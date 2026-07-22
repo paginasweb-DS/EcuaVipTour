@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -111,7 +112,7 @@ import { AdminService } from '../../../core/services/admin.service';
             <!-- Left: Photo -->
             <div class="flex-1">
               <div class="aspect-video rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 relative group">
-                <img *ngIf="v.foto_auto_url" [src]="'http://localhost:5001/' + v.foto_auto_url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <img *ngIf="v.foto_auto_url" [src]="(apiUrl + '/') + v.foto_auto_url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 <div class="absolute bottom-2 left-2">
                   <span class="text-white font-black text-[9px] uppercase tracking-widest bg-slate-900/80 backdrop-blur-sm px-2 py-0.5 rounded-lg border border-white/20 shadow-lg">{{ v.placa }}</span>
                 </div>
@@ -178,7 +179,7 @@ import { AdminService } from '../../../core/services/admin.service';
 
       <!-- Modal Visor Imagen (Simple) -->
       <div *ngIf="showModal" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-md" (click)="showModal = false">
-        <img [src]="'http://localhost:5001/' + modalImg" class="max-w-full max-h-full rounded-2xl shadow-2xl animate-in zoom-in duration-300">
+        <img [src]="(apiUrl + '/') + modalImg" class="max-w-full max-h-full rounded-2xl shadow-2xl animate-in zoom-in duration-300">
         <button class="absolute top-8 right-8 text-white hover:rotate-90 transition-transform">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
@@ -187,6 +188,7 @@ import { AdminService } from '../../../core/services/admin.service';
   `
 })
 export class GestionVehiculosComponent implements OnInit {
+  apiUrl = environment.apiUrl;
   vehiculos: any[] = [];
   filtro: string = 'pendiente';
   loading: boolean = false;

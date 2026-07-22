@@ -1,41 +1,31 @@
 package com.ecuaviptour.config;
 
-import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.SocketConfig;
 import com.corundumstudio.socketio.SocketIOServer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-/**
- * Socket.IO Server Configuration.
- * Binds the Socket.IO engine to a custom port (e.g. 5002) to run alongside the Tomcat HTTP port (5001).
- */
-@org.springframework.context.annotation.Configuration
+@Configuration
 public class SocketIOConfig {
 
     @Value("${app.socket.host:0.0.0.0}")
-    private String host;
+    private String socketHost;
 
     @Value("${app.socket.port:5002}")
-    private Integer port;
+    private int socketPort;
+
+    @Value("${app.frontend-url:http://localhost:4200}")
+    private String frontendUrl;
 
     @Bean
     public SocketIOServer socketIOServer() {
-        Configuration config = new Configuration();
-        config.setHostname(host);
-        config.setPort(port);
-        // Allow all origins for seamless CORS integration
-        config.setOrigin("*");
-        
-        // Add ping settings for persistent connections
-        config.setPingInterval(25000);
-        config.setPingTimeout(60000);
+        com.corundumstudio.socketio.Configuration config =
+                new com.corundumstudio.socketio.Configuration();
 
-        // Configure SocketConfig to reuse address to prevent "Address already in use" on fast restarts
-        SocketConfig socketConfig = new SocketConfig();
-        socketConfig.setReuseAddress(true);
-        config.setSocketConfig(socketConfig);
-        
+        config.setHostname(socketHost);
+        config.setPort(socketPort);
+        config.setOrigin(frontendUrl);
+
         return new SocketIOServer(config);
     }
 }

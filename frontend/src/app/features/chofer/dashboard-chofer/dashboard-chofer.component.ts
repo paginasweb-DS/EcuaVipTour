@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -81,7 +82,7 @@ import { ChatPanelComponent } from '../../../shared/components/chat-panel/chat-p
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                       <div class="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center shadow-lg overflow-hidden border border-gray-800 shrink-0">
-                        <img *ngIf="viajeActual.foto_cliente_url" [src]="'http://localhost:5001/' + viajeActual.foto_cliente_url" class="w-full h-full object-cover rounded-full">
+                        <img *ngIf="viajeActual.foto_cliente_url" [src]="(apiUrl + '/') + viajeActual.foto_cliente_url" class="w-full h-full object-cover rounded-full">
                         <svg *ngIf="!viajeActual.foto_cliente_url" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                       </div>
                       <div>
@@ -290,7 +291,7 @@ import { ChatPanelComponent } from '../../../shared/components/chat-panel/chat-p
                           
                           <!-- Avatar de Pasajero -->
                           <div class="w-8 h-8 bg-gray-150 text-gray-500 rounded-full flex items-center justify-center overflow-hidden border border-gray-200 shrink-0">
-                            <img *ngIf="pasaje.foto_usuario_url" [src]="'http://localhost:5001/' + pasaje.foto_usuario_url" class="w-full h-full object-cover">
+                            <img *ngIf="pasaje.foto_usuario_url" [src]="(apiUrl + '/') + pasaje.foto_usuario_url" class="w-full h-full object-cover">
                             <svg *ngIf="!pasaje.foto_usuario_url" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                           </div>
 
@@ -605,7 +606,7 @@ import { ChatPanelComponent } from '../../../shared/components/chat-panel/chat-p
                 <!-- Avatar with Badge -->
                 <div class="relative w-8 h-8 shrink-0">
                   <div class="w-full h-full bg-gray-200 text-gray-500 rounded-full flex items-center justify-center overflow-hidden border border-gray-200 shadow-sm">
-                    <img *ngIf="pasaje.foto_usuario_url" [src]="'http://localhost:5001/' + pasaje.foto_usuario_url" class="w-full h-full object-cover">
+                    <img *ngIf="pasaje.foto_usuario_url" [src]="(apiUrl + '/') + pasaje.foto_usuario_url" class="w-full h-full object-cover">
                     <svg *ngIf="!pasaje.foto_usuario_url" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                   </div>
                   
@@ -726,6 +727,7 @@ import { ChatPanelComponent } from '../../../shared/components/chat-panel/chat-p
   `]
 })
 export class DashboardChoferComponent implements OnInit, OnDestroy {
+  apiUrl = environment.apiUrl;
   usuario: any = null;
   viajeActual: any = null;
   nuevosViajes: any[] = [];

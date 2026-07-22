@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
@@ -34,7 +35,7 @@ import { FormsModule } from '@angular/forms';
             <div class="relative w-36 h-36 rounded-full border-4 border-slate-100 shadow-md group shrink-0 aspect-square bg-slate-50 flex items-center justify-center overflow-hidden">
               <img 
                 *ngIf="previewUrl || (usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)" 
-                [src]="previewUrl || ('http://localhost:5001/' + (usuario.foto_perfil_url || usuario.fotoPerfilUrl))" 
+                [src]="previewUrl || ((apiUrl + '/') + (usuario.foto_perfil_url || usuario.fotoPerfilUrl))" 
                 class="w-full h-full object-cover rounded-full"
                 alt="Foto de Perfil">
               <span *ngIf="!previewUrl && !(usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)" class="text-3xl font-black text-blue-600 select-none">
@@ -225,6 +226,7 @@ import { FormsModule } from '@angular/forms';
   `]
 })
 export class PerfilComponent implements OnInit {
+  apiUrl = environment.apiUrl;
   usuario: any;
   isLoading = false;
   isEditing = false;

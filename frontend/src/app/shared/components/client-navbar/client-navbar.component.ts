@@ -6,6 +6,7 @@ import { SocketService } from '../../../core/services/socket.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { Output, EventEmitter } from '@angular/core';
 import { filter } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-client-navbar',
@@ -105,7 +106,7 @@ import { filter } from 'rxjs/operators';
               <button class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100">
                 <div class="w-8 h-8 rounded-full bg-ecuavip-blue/10 flex items-center justify-center text-ecuavip-blue font-black text-sm transition-all overflow-hidden border border-ecuavip-blue/5 shadow-sm">
                   <span *ngIf="!(usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)">{{ usuario?.nombre?.charAt(0)?.toUpperCase() || 'U' }}</span>
-                  <img *ngIf="usuario?.foto_perfil_url || usuario?.fotoPerfilUrl" [src]="'http://localhost:5001/' + (usuario.foto_perfil_url || usuario.fotoPerfilUrl)" class="w-full h-full object-cover rounded-full">
+                  <img *ngIf="usuario?.foto_perfil_url || usuario?.fotoPerfilUrl" [src]="apiUrl + '/' + (usuario.foto_perfil_url || usuario.fotoPerfilUrl)" class="w-full h-full object-cover rounded-full">
                 </div>
                 <div class="text-left hidden lg:block">
                   <p class="text-sm font-bold text-gray-900 leading-none">{{ usuario?.nombre?.split(' ')[0] || 'Mi cuenta' }}</p>
@@ -208,6 +209,7 @@ export class ClientNavbarComponent implements OnInit {
     return this.authService.getUsuario();
   }
   unreadCount = 0;
+  apiUrl = environment.apiUrl;
   isLoggedIn = false;
   isAdmin = false;
   isChofer = false;

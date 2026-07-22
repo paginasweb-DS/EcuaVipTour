@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SocketService } from '../../../core/services/socket.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-chofer-navbar',
@@ -40,7 +41,7 @@ import { SocketService } from '../../../core/services/socket.service';
           <div class="relative group">
             <button class="flex items-center gap-3 p-1.5 pr-4 rounded-2xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100">
               <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-black shadow-lg shadow-blue-600/20 overflow-hidden shrink-0">
-                <img *ngIf="usuario?.foto_perfil_url || usuario?.fotoPerfilUrl" [src]="'http://localhost:5001/' + (usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)" class="w-full h-full object-cover">
+                <img *ngIf="usuario?.foto_perfil_url || usuario?.fotoPerfilUrl" [src]="apiUrl + '/' + (usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)" class="w-full h-full object-cover">
                 <span *ngIf="!(usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)">{{ usuario?.nombre?.charAt(0) }}</span>
               </div>
               <div class="text-left hidden lg:block">
@@ -94,6 +95,7 @@ import { SocketService } from '../../../core/services/socket.service';
 })
 export class ChoferNavbarComponent implements OnInit {
   usuario: any = null;
+  apiUrl = environment.apiUrl;
 
   constructor(
     private authService: AuthService,

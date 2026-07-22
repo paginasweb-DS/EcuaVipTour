@@ -64,7 +64,7 @@
                 <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shadow-sm border-2 transition-all duration-300 overflow-hidden"
                      [ngClass]="selectedClienteId === chat.cliente_id ? 'bg-white/20 border-white/30 text-white' : 'bg-gray-100 border-transparent text-gray-500'">
                   <span *ngIf="!chat.foto_perfil_url">{{ chat.cliente_nombre.charAt(0) | uppercase }}</span>
-                  <img *ngIf="chat.foto_perfil_url" [src]="'http://localhost:5001/' + chat.foto_perfil_url" class="w-full h-full object-cover">
+                  <img *ngIf="chat.foto_perfil_url" [src]="(apiUrl + '/') + chat.foto_perfil_url" class="w-full h-full object-cover">
                 </div>
               </div>
               
@@ -138,7 +138,7 @@
           
           <div class="w-10 h-10 rounded-full bg-ecuavip-blue/10 text-ecuavip-blue flex items-center justify-center font-bold overflow-hidden border border-ecuavip-blue/10">
             <span *ngIf="!selectedChat.foto_perfil_url">{{ selectedChat.cliente_nombre.charAt(0) | uppercase }}</span>
-            <img *ngIf="selectedChat.foto_perfil_url" [src]="'http://localhost:5001/' + selectedChat.foto_perfil_url" class="w-full h-full object-cover">
+            <img *ngIf="selectedChat.foto_perfil_url" [src]="(apiUrl + '/') + selectedChat.foto_perfil_url" class="w-full h-full object-cover">
           </div>
           <div>
             <h3 class="font-extrabold text-gray-900 leading-tight">{{ selectedChat.cliente_nombre }}</h3>
@@ -197,7 +197,7 @@
             <div class="flex items-center gap-2.5 px-4 py-1.5 bg-green-50 text-green-700 rounded-xl border border-green-100 shadow-sm shrink-0">
               <div class="w-7 h-7 rounded-full bg-green-200 text-green-800 flex items-center justify-center font-bold overflow-hidden text-xs">
                 <span *ngIf="!selectedChat.soporte_asignado_avatar">{{ selectedChat.soporte_asignado_nombre.charAt(0) | uppercase }}</span>
-                <img *ngIf="selectedChat.soporte_asignado_avatar" [src]="'http://localhost:5001/' + selectedChat.soporte_asignado_avatar" class="w-full h-full object-cover">
+                <img *ngIf="selectedChat.soporte_asignado_avatar" [src]="(apiUrl + '/') + selectedChat.soporte_asignado_avatar" class="w-full h-full object-cover">
               </div>
               <div class="text-left">
                 <p class="text-[8px] font-black uppercase tracking-widest text-green-600/80 leading-none">Agente Asignado</p>
@@ -251,7 +251,7 @@
       <div class="grid md:grid-cols-2 h-full">
         <!-- Izquierda: Imagen con zoom suave -->
         <div class="bg-gray-50 flex items-center justify-center p-8 min-h-[350px]">
-          <img [src]="'http://localhost:5001' + selectedChat.comprobante_url" alt="Comprobante" 
+          <img [src]="apiUrl + selectedChat.comprobante_url" alt="Comprobante" 
                class="max-w-full max-h-full object-contain rounded-[1.5rem] shadow-2xl transition-transform hover:scale-105 duration-500">
         </div>
         

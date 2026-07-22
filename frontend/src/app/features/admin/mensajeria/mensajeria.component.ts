@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +18,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './mensajeria.component.html'
 })
 export class MensajeriaComponent implements OnInit, OnDestroy {
+  apiUrl = environment.apiUrl;
   inbox: any[] = [];
   selectedClienteId: number | null = null;
   selectedChat: any = null; // Toda la info del inbox seleccionado

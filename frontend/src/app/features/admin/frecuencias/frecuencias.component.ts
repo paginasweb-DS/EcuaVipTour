@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { SoapService } from '../../../core/services/soap.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 declare var google: any;
 
@@ -1702,7 +1703,7 @@ export class FrecuenciasComponent implements OnInit, AfterViewInit {
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-    return 'http://localhost:5001/' + url;
+    return environment.apiUrl + '/' + url;
   }
 
   getReservasAgrupadas(): any[] {

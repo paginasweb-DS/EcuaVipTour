@@ -2,13 +2,19 @@ import { Injectable, NgZone } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable, Subject } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
-  private socket: Socket;
-  private serverUrl = 'http://localhost:5002';
+  private readonly socket: Socket = io(environment.socketUrl, {
+    transports: ['websocket', 'polling'],
+    reconnection: true,
+    reconnectionAttempts: 10,
+    reconnectionDelay: 1000,
+    autoConnect: false
+  });
   public isChatActive = false;
   public unreadMessages = 0;
   public openChatOnLoad = false;
@@ -18,12 +24,6 @@ export class SocketService {
     private authService: AuthService,
     private ngZone: NgZone
   ) {
-    this.socket = io(this.serverUrl, {
-      autoConnect: false,
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-    });
 
     // Re-unirse a la sala automáticamente en cada reconexión
     this.socket.on('connect', () => {

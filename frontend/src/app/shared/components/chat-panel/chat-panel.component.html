@@ -16,7 +16,7 @@
       
       <!-- Avatar -->
       <div class="w-10 h-10 rounded-full overflow-hidden bg-white/20 flex items-center justify-center backdrop-blur-md shrink-0 shadow-md">
-        <img *ngIf="otroFotoUrl" [src]="otroFotoUrl.indexOf('http') === 0 ? otroFotoUrl : 'http://localhost:5001/' + otroFotoUrl" class="w-full h-full object-cover rounded-full">
+        <img *ngIf="otroFotoUrl" [src]="otroFotoUrl.indexOf('http') === 0 ? otroFotoUrl : (apiUrl + '/') + otroFotoUrl" class="w-full h-full object-cover rounded-full">
         <svg *ngIf="!otroFotoUrl" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
       <div>

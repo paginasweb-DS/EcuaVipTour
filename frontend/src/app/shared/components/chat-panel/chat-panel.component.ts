@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +14,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './chat-panel.component.html'
 })
 export class ChatPanelComponent implements OnInit, OnChanges, OnDestroy, AfterViewChecked {
+  apiUrl = environment.apiUrl;
   @Input() otroId!: number;
   @Input() viajeId?: number;
   @Input() showHeader: boolean = false;

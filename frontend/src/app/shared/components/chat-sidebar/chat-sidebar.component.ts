@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +16,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./chat-sidebar.component.css']
 })
 export class ChatSidebarComponent implements OnInit, OnChanges, OnDestroy, AfterViewChecked {
+  apiUrl = environment.apiUrl;
   @Input() isOpen: boolean = false;
   @Input() tipoReceptor: 'admin' | 'chofer' = 'admin';
   @Input() viajeId: number | undefined;

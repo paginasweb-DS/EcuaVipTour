@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 import { Observable, BehaviorSubject, tap, map } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
@@ -267,7 +268,7 @@ export class AdminService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    let url = `http://localhost:5001/api/admin/reportes/ingresos?periodo=${period}`;
+    let url = `${environment.apiUrl}/api/admin/reportes/ingresos?periodo=${period}`;
     if (startDate) url += `&fecha_inicio=${startDate}`;
     if (endDate) url += `&fecha_fin=${endDate}`;
     return this.http.get(url, { headers, responseType: 'blob' });
@@ -278,7 +279,7 @@ export class AdminService {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    let url = `http://localhost:5001/api/admin/reportes/gastos?periodo=${period}`;
+    let url = `${environment.apiUrl}/api/admin/reportes/gastos?periodo=${period}`;
     if (startDate) url += `&fecha_inicio=${startDate}`;
     if (endDate) url += `&fecha_fin=${endDate}`;
     return this.http.get(url, { headers, responseType: 'blob' });

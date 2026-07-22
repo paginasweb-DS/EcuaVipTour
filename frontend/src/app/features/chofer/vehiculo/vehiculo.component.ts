@@ -1,3 +1,4 @@
+import { environment } from '../../../../environments/environment';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -26,7 +27,7 @@ import { ChoferService } from '../../../core/services/chofer.service';
           <div class="relative group w-full max-w-lg">
             <div class="aspect-[16/9] w-full rounded-3xl overflow-hidden bg-white shadow-sm border-4 border-white relative transition-all duration-500 group">
               <img *ngIf="vehiculo.foto_auto_url || vehiculo.foto_auto_url_temp" 
-                   [src]="vehiculo.foto_auto_url_temp || ('http://localhost:5001/' + vehiculo.foto_auto_url)" 
+                   [src]="vehiculo.foto_auto_url_temp || ((apiUrl + '/') + vehiculo.foto_auto_url)" 
                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
               
               <div *ngIf="!vehiculo.foto_auto_url && !vehiculo.foto_auto_url_temp" class="w-full h-full flex flex-col items-center justify-center text-slate-300 bg-slate-50">
@@ -190,7 +191,7 @@ import { ChoferService } from '../../../core/services/chofer.service';
                     <input *ngIf="isEditing && vehiculo.estado !== 'activo'" type="file" (change)="onFileSelected($event, 'foto_matricula')" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
                   </div>
                   <div *ngIf="vehiculo.foto_matricula_url || vehiculo.foto_matricula_url_temp" class="mt-4 rounded-xl overflow-hidden h-24 shadow-md">
-                    <img [src]="vehiculo.foto_matricula_url_temp || ('http://localhost:5001/' + vehiculo.foto_matricula_url)" class="w-full h-full object-cover">
+                    <img [src]="vehiculo.foto_matricula_url_temp || ((apiUrl + '/') + vehiculo.foto_matricula_url)" class="w-full h-full object-cover">
                   </div>
                 </div>
 
@@ -207,7 +208,7 @@ import { ChoferService } from '../../../core/services/chofer.service';
                     <input *ngIf="isEditing && vehiculo.estado !== 'activo'" type="file" (change)="onFileSelected($event, 'foto_licencia')" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
                   </div>
                   <div *ngIf="vehiculo.foto_licencia_url || vehiculo.foto_licencia_url_temp" class="mt-4 rounded-xl overflow-hidden h-24 shadow-md">
-                    <img [src]="vehiculo.foto_licencia_url_temp || ('http://localhost:5001/' + vehiculo.foto_licencia_url)" class="w-full h-full object-cover">
+                    <img [src]="vehiculo.foto_licencia_url_temp || ((apiUrl + '/') + vehiculo.foto_licencia_url)" class="w-full h-full object-cover">
                   </div>
                 </div>
               </div>
@@ -284,6 +285,7 @@ import { ChoferService } from '../../../core/services/chofer.service';
   `]
 })
 export class VehiculoComponent implements OnInit {
+  apiUrl = environment.apiUrl;
   vehiculo: any = {
     placa: '',
     marca: '',
