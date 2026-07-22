@@ -27,7 +27,7 @@ public class ArchivoService {
 
     public ArchivoService(
             S3Client r2Client,
-            @Value("${r2.bucket}") String bucket,
+            @Value("${r2.bucket:}") String bucket,
             @Value("${r2.public-url:}") String publicUrl) {
 
         this.r2Client = r2Client;
@@ -36,6 +36,10 @@ public class ArchivoService {
     }
 
     public String subirImagen(MultipartFile archivo) throws IOException {
+
+        if (bucket == null || bucket.isBlank()) {
+            throw new IllegalStateException("Cloudflare R2 no está configurado en las variables de entorno (falta R2_BUCKET)");
+        }
 
         if (archivo == null || archivo.isEmpty()) {
             throw new IllegalArgumentException("El archivo está vacío");

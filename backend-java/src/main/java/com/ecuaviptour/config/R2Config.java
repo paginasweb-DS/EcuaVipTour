@@ -17,15 +17,18 @@ public class R2Config {
 
     @Bean
     public S3Client r2Client(
-            @Value("${r2.endpoint}") String endpoint,
-            @Value("${r2.access-key-id}") String accessKeyId,
-            @Value("${r2.secret-access-key}") String secretAccessKey) {
+            @Value("${r2.endpoint:https://r2.cloudflarestorage.com}") String endpoint,
+            @Value("${r2.access-key-id:dummy-key}") String accessKeyId,
+            @Value("${r2.secret-access-key:dummy-secret}") String secretAccessKey) {
 
-        AwsBasicCredentials credentials =
-                AwsBasicCredentials.create(accessKeyId, secretAccessKey);
+        String key = (accessKeyId != null && !accessKeyId.isBlank()) ? accessKeyId : "dummy-key";
+        String secret = (secretAccessKey != null && !secretAccessKey.isBlank()) ? secretAccessKey : "dummy-secret";
+        String url = (endpoint != null && !endpoint.isBlank()) ? endpoint : "https://r2.cloudflarestorage.com";
+
+        AwsBasicCredentials credentials = AwsBasicCredentials.create(key, secret);
 
         return S3Client.builder()
-                .endpointOverride(URI.create(endpoint))
+                .endpointOverride(URI.create(url))
                 .credentialsProvider(
                         StaticCredentialsProvider.create(credentials)
                 )
