@@ -156,7 +156,7 @@ import { AdminNavComponent } from '../../components/admin-nav/admin-nav.componen
               <button class="flex items-center gap-3 p-1.5 pr-4 rounded-full hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200">
                 <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-black shadow-lg shadow-blue-600/20 overflow-hidden">
                   <span *ngIf="!(usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)">{{ usuario?.nombre?.charAt(0) }}</span>
-                  <img *ngIf="usuario?.foto_perfil_url || usuario?.fotoPerfilUrl" [src]="'http://localhost:5001/' + (usuario.foto_perfil_url || usuario.fotoPerfilUrl)" class="w-full h-full object-cover">
+                  <img *ngIf="usuario?.foto_perfil_url || usuario?.fotoPerfilUrl" [src]="'http://localhost:5001/' + (usuario.foto_perfil_url || usuario.fotoPerfilUrl)" class="w-full h-full object-cover rounded-full">
                 </div>
                 <div class="text-left hidden lg:block">
                   <p class="text-sm font-semibold text-slate-800 leading-tight">{{ usuario?.nombre }}</p>

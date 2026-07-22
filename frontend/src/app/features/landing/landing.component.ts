@@ -21,7 +21,7 @@ interface RutaPopular {
     <div class="min-h-screen bg-[#0a1628] font-sans relative overflow-x-hidden pt-[72px]">
       
       <!-- ================= HERO SECTION ================= -->
-      <section class="relative h-[60vh] flex items-center justify-start overflow-hidden bg-[#0a1628] py-20 px-6 sm:px-12 md:px-20">
+      <section class="relative min-h-[650px] flex items-center justify-start overflow-hidden bg-[#0a1628] py-16 sm:py-24 px-6 sm:px-12 md:px-20">
         <!-- Background and Patterns -->
         <div class="absolute inset-0 z-0">
           <div class="absolute inset-0 bg-gradient-to-r from-[#0a1628] via-[#0a1628]/90 to-transparent z-10"></div>

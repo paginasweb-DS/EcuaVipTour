@@ -12,7 +12,7 @@ import { ChatSidebarComponent } from '../../shared/components/chat-sidebar/chat-
   template: `
     <div class="min-h-screen bg-white">
       <!-- HERO CONTACTO (DARK PREMIUM) -->
-      <section class="relative h-[60vh] flex items-center justify-center bg-[#0a1628] overflow-hidden">
+      <section class="relative min-h-[500px] py-16 sm:py-24 flex items-center justify-center bg-[#0a1628] overflow-hidden">
         <div class="absolute inset-0 z-0">
           <div class="absolute inset-0 bg-gradient-to-r from-[#0a1628] to-transparent z-10"></div>
           <div class="absolute inset-0 opacity-35 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?auto=format&fit=crop&q=80')"></div>

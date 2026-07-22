@@ -24,7 +24,7 @@ interface Amenity {
   template: `
     <div class="min-h-screen bg-white">
       <!-- HERO SECTION -->
-      <section class="relative h-[60vh] flex items-center justify-center overflow-hidden bg-[#0a1628]">
+      <section class="relative min-h-[600px] py-16 sm:py-24 flex items-center justify-center overflow-hidden bg-[#0a1628]">
         <div class="absolute inset-0 z-0">
           <div class="absolute inset-0 bg-gradient-to-r from-[#0a1628] to-transparent z-10"></div>
           <!-- Imagen de fondo decorativa (puede ser una de los recursos si tuviéramos URL directa, sino usamos gradiente) -->
