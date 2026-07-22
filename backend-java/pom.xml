@@ -22,6 +22,13 @@
     </properties>
     
     <dependencies>
+        <!-- AWS SDK S3 for Cloudflare R2 -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.31.54</version>
+        </dependency>
+
         <!-- Spring Boot Web Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
