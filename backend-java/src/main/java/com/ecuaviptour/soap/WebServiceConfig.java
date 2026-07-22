@@ -33,7 +33,7 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     public void addInterceptors(List<EndpointInterceptor> interceptors) {
         PayloadValidatingInterceptor validatingInterceptor = new PayloadValidatingInterceptor();
         validatingInterceptor.setValidateRequest(true);
-        validatingInterceptor.setValidateResponse(true);
+        validatingInterceptor.setValidateResponse(false);
         validatingInterceptor.setSchemas(new Resource[]{
                 new ClassPathResource("soap/xsd/auth.xsd"),
                 new ClassPathResource("soap/xsd/viajes.xsd"),

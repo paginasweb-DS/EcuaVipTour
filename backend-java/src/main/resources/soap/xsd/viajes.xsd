@@ -50,7 +50,7 @@
             <xs:element name="monto" type="xs:double"/>
             <xs:element name="estado_pago" type="xs:string"/>
             <xs:element name="estado_logistico" type="xs:string"/>
-            <xs:element name="tipo_servicio" type="xs:string"/>
+            <xs:element name="tipo_servicio" type="xs:string" minOccurs="0"/>
             <xs:element name="fecha" type="xs:string"/>
             <xs:element name="fecha_limite_pago" type="xs:string" minOccurs="0"/>
             <xs:element name="comentario_rechazo" type="xs:string" minOccurs="0"/>
