@@ -34,4 +34,17 @@ export class ArchivoService {
       { headers }
     );
   }
+
+  /**
+   * Resuelve cualquier URL de imagen, sea una URL absoluta de R2/CDN
+   * o una ruta relativa legacy del backend.
+   * Uso: <img [src]="ArchivoService.resolverUrl(foto_url)">
+   */
+  static resolverUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return `${environment.apiUrl}/${url}`;
+  }
 }

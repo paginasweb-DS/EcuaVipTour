@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { ImagenUrlPipe } from '../../../shared/pipes/imagen-url.pipe';
 
 @Component({
   selector: 'app-gestion-vehiculos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImagenUrlPipe],
   template: `
     <div class="space-y-8">
       <!-- Header / Toolbar Única Alineada con Bordes -->
@@ -112,7 +113,7 @@ import { AdminService } from '../../../core/services/admin.service';
             <!-- Left: Photo -->
             <div class="flex-1">
               <div class="aspect-video rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 relative group">
-                <img *ngIf="v.foto_auto_url" [src]="(apiUrl + '/') + v.foto_auto_url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <img *ngIf="v.foto_auto_url" [src]="v.foto_auto_url | imagenUrl" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 <div class="absolute bottom-2 left-2">
                   <span class="text-white font-black text-[9px] uppercase tracking-widest bg-slate-900/80 backdrop-blur-sm px-2 py-0.5 rounded-lg border border-white/20 shadow-lg">{{ v.placa }}</span>
                 </div>

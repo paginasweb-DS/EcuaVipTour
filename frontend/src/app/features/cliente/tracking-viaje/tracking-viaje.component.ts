@@ -10,13 +10,13 @@ import { ChatService } from '../../../core/services/chat.service';
 import { ChatSidebarComponent } from '../../../shared/components/chat-sidebar/chat-sidebar.component';
 import { Subscription, Observable } from 'rxjs';
 import { CountdownService } from '../../../core/services/countdown.service';
-
 import { FormsModule } from '@angular/forms';
+import { ImagenUrlPipe } from '../../../shared/pipes/imagen-url.pipe';
 
 @Component({
   selector: 'app-tracking-viaje',
   standalone: true,
-  imports: [CommonModule, RouterModule, QRCodeModule, ChatSidebarComponent, FormsModule],
+  imports: [CommonModule, RouterModule, QRCodeModule, ChatSidebarComponent, FormsModule, ImagenUrlPipe],
   templateUrl: './tracking-viaje.component.html'
 })
 export class TrackingViajeComponent implements OnInit, OnDestroy {

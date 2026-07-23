@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ImagenUrlPipe } from '../../../shared/pipes/imagen-url.pipe';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImagenUrlPipe],
   template: `
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
 
@@ -35,7 +36,7 @@ import { FormsModule } from '@angular/forms';
             <div class="relative w-36 h-36 rounded-full border-4 border-slate-100 shadow-md group shrink-0 aspect-square bg-slate-50 flex items-center justify-center overflow-hidden">
               <img 
                 *ngIf="previewUrl || (usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)" 
-                [src]="previewUrl || ((apiUrl + '/') + (usuario.foto_perfil_url || usuario.fotoPerfilUrl))" 
+                [src]="previewUrl || ((usuario.foto_perfil_url || usuario.fotoPerfilUrl) | imagenUrl)" 
                 class="w-full h-full object-cover rounded-full"
                 alt="Foto de Perfil">
               <span *ngIf="!previewUrl && !(usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)" class="text-3xl font-black text-blue-600 select-none">

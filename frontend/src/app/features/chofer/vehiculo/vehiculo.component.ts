@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChoferService } from '../../../core/services/chofer.service';
+import { ImagenUrlPipe } from '../../../shared/pipes/imagen-url.pipe';
 
 @Component({
   selector: 'app-vehiculo',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImagenUrlPipe],
   template: `
     <div class="relative overflow-x-hidden">
       
@@ -27,7 +28,7 @@ import { ChoferService } from '../../../core/services/chofer.service';
           <div class="relative group w-full max-w-lg">
             <div class="aspect-[16/9] w-full rounded-3xl overflow-hidden bg-white shadow-sm border-4 border-white relative transition-all duration-500 group">
               <img *ngIf="vehiculo.foto_auto_url || vehiculo.foto_auto_url_temp" 
-                   [src]="vehiculo.foto_auto_url_temp || ((apiUrl + '/') + vehiculo.foto_auto_url)" 
+                   [src]="vehiculo.foto_auto_url_temp || (vehiculo.foto_auto_url | imagenUrl)" 
                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
               
               <div *ngIf="!vehiculo.foto_auto_url && !vehiculo.foto_auto_url_temp" class="w-full h-full flex flex-col items-center justify-center text-slate-300 bg-slate-50">

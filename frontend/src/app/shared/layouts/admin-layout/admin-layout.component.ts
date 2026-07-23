@@ -6,13 +6,14 @@ import { SocketService } from '../../../core/services/socket.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { Subscription } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { ImagenUrlPipe } from '../../pipes/imagen-url.pipe';
 
 import { AdminNavComponent } from '../../components/admin-nav/admin-nav.component';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, AdminNavComponent],
+  imports: [CommonModule, RouterModule, AdminNavComponent, ImagenUrlPipe],
   template: `
     <div class="flex h-screen bg-slate-50 font-sans overflow-hidden">
       
@@ -157,7 +158,7 @@ import { AdminNavComponent } from '../../components/admin-nav/admin-nav.componen
               <button class="flex items-center gap-3 p-1.5 pr-4 rounded-full hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200">
                 <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-black shadow-lg shadow-blue-600/20 overflow-hidden">
                   <span *ngIf="!(usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)">{{ usuario?.nombre?.charAt(0) }}</span>
-                  <img *ngIf="usuario?.foto_perfil_url || usuario?.fotoPerfilUrl" [src]="apiUrl + '/' + (usuario.foto_perfil_url || usuario.fotoPerfilUrl)" class="w-full h-full object-cover rounded-full">
+                  <img *ngIf="usuario?.foto_perfil_url || usuario?.fotoPerfilUrl" [src]="(usuario.foto_perfil_url || usuario.fotoPerfilUrl) | imagenUrl" class="w-full h-full object-cover rounded-full">
                 </div>
                 <div class="text-left hidden lg:block">
                   <p class="text-sm font-semibold text-slate-800 leading-tight">{{ usuario?.nombre }}</p>

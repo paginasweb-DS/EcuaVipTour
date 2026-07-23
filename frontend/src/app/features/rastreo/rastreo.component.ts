@@ -13,11 +13,12 @@ import { SocketService } from '../../core/services/socket.service';
 import { ChatService } from '../../core/services/chat.service';
 import { ChatSidebarComponent } from '../../shared/components/chat-sidebar/chat-sidebar.component';
 import { QRCodeModule } from 'angularx-qrcode';
+import { ImagenUrlPipe } from '../../shared/pipes/imagen-url.pipe';
 
 @Component({
   selector: 'app-rastreo',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, GoogleMapsModule, QRCodeModule, ChatSidebarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, GoogleMapsModule, QRCodeModule, ChatSidebarComponent, ImagenUrlPipe],
   template: `
     <div class="h-screen md:h-[calc(100vh-72px)] w-full flex flex-col overflow-hidden bg-gray-50/50">
       
@@ -252,7 +253,7 @@ import { QRCodeModule } from 'angularx-qrcode';
                   <!-- Vehículo Info -->
                   <div *ngIf="selectedPackage.vehiculo" class="flex flex-col items-center gap-1.5 shrink-0">
                     <div class="w-20 h-12 bg-white rounded-xl overflow-hidden border border-blue-100 shadow-sm relative shrink-0">
-                      <img *ngIf="selectedPackage.vehiculo.foto_auto_url" [src]="(apiUrl + '/') + selectedPackage.vehiculo.foto_auto_url" class="w-full h-full object-cover">
+                      <img *ngIf="selectedPackage.vehiculo.foto_auto_url" [src]="selectedPackage.vehiculo.foto_auto_url | imagenUrl" class="w-full h-full object-cover">
                       <div *ngIf="!selectedPackage.vehiculo.foto_auto_url" class="w-full h-full flex items-center justify-center text-blue-200">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.6C2.1 10.3 2 10.6 2 11v5c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
                       </div>

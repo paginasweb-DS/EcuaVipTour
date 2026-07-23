@@ -6,11 +6,12 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ChoferService } from '../../../core/services/chofer.service';
 import { Router } from '@angular/router';
 import { VehiculoComponent } from '../vehiculo/vehiculo.component';
+import { ImagenUrlPipe } from '../../../shared/pipes/imagen-url.pipe';
 
 @Component({
   selector: 'app-perfil-chofer',
   standalone: true,
-  imports: [CommonModule, FormsModule, VehiculoComponent],
+  imports: [CommonModule, FormsModule, VehiculoComponent, ImagenUrlPipe],
   templateUrl: './perfil-chofer.component.html',
   styleUrl: './perfil-chofer.component.css'
 })

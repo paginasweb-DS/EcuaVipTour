@@ -64,7 +64,7 @@
                 <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shadow-sm border-2 transition-all duration-300 overflow-hidden"
                      [ngClass]="selectedClienteId === chat.cliente_id ? 'bg-white/20 border-white/30 text-white' : 'bg-gray-100 border-transparent text-gray-500'">
                   <span *ngIf="!chat.foto_perfil_url">{{ chat.cliente_nombre.charAt(0) | uppercase }}</span>
-                  <img *ngIf="chat.foto_perfil_url" [src]="(apiUrl + '/') + chat.foto_perfil_url" class="w-full h-full object-cover">
+                  <img *ngIf="chat.foto_perfil_url" [src]="chat.foto_perfil_url | imagenUrl" class="w-full h-full object-cover">
                 </div>
               </div>
               
@@ -138,7 +138,7 @@
           
           <div class="w-10 h-10 rounded-full bg-ecuavip-blue/10 text-ecuavip-blue flex items-center justify-center font-bold overflow-hidden border border-ecuavip-blue/10">
             <span *ngIf="!selectedChat.foto_perfil_url">{{ selectedChat.cliente_nombre.charAt(0) | uppercase }}</span>
-            <img *ngIf="selectedChat.foto_perfil_url" [src]="(apiUrl + '/') + selectedChat.foto_perfil_url" class="w-full h-full object-cover">
+            <img *ngIf="selectedChat.foto_perfil_url" [src]="selectedChat.foto_perfil_url | imagenUrl" class="w-full h-full object-cover">
           </div>
           <div>
             <h3 class="font-extrabold text-gray-900 leading-tight">{{ selectedChat.cliente_nombre }}</h3>

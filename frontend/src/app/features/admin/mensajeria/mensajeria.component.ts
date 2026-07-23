@@ -11,10 +11,12 @@ import { ChatPanelComponent } from '../../../shared/components/chat-panel/chat-p
 import { QRCodeModule } from 'angularx-qrcode';
 import { Subscription } from 'rxjs';
 
+import { ImagenUrlPipe } from '../../../shared/pipes/imagen-url.pipe';
+
 @Component({
   selector: 'app-mensajeria',
   standalone: true,
-  imports: [CommonModule, FormsModule, ChatPanelComponent, QRCodeModule],
+  imports: [CommonModule, FormsModule, ChatPanelComponent, QRCodeModule, ImagenUrlPipe],
   templateUrl: './mensajeria.component.html'
 })
 export class MensajeriaComponent implements OnInit, OnDestroy {

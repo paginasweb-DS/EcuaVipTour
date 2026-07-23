@@ -42,7 +42,7 @@
         <div class="relative w-36 h-36 rounded-full border-4 border-slate-100 shadow-md group shrink-0 aspect-square bg-slate-50 flex items-center justify-center overflow-hidden">
           <img 
             *ngIf="previewUrl || (usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)" 
-            [src]="previewUrl || ((apiUrl + '/') + (usuario.foto_perfil_url || usuario.fotoPerfilUrl))" 
+            [src]="previewUrl || ((usuario.foto_perfil_url || usuario.fotoPerfilUrl) | imagenUrl)" 
             class="w-full h-full object-cover rounded-full"
             alt="Foto de Perfil">
           <span *ngIf="!previewUrl && !(usuario?.foto_perfil_url || usuario?.fotoPerfilUrl)" class="text-3xl font-black text-blue-600 select-none">

@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
+import { ImagenUrlPipe } from '../../../shared/pipes/imagen-url.pipe';
 
 @Component({
   selector: 'app-usuarios',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImagenUrlPipe],
   template: `
     <div class="space-y-6">
       <!-- Header / Toolbar Única Alineada con Bordes -->
@@ -156,7 +157,7 @@ import { AdminService } from '../../../core/services/admin.service';
                       [class.ring-2]="editingUserId === user.id"
                       class="relative w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold border-2 border-white shadow-sm overflow-hidden text-xs flex-shrink-0 group/photo transition-all aspect-square ring-blue-500/30"
                     >
-                      <img *ngIf="user.foto_perfil_url" [src]="(apiUrl + '/') + user.foto_perfil_url" class="w-full h-full object-cover rounded-full">
+                      <img *ngIf="user.foto_perfil_url" [src]="user.foto_perfil_url | imagenUrl" class="w-full h-full object-cover rounded-full">
                       <span *ngIf="!user.foto_perfil_url">{{ user.nombre.charAt(0) }}</span>
                       
                       <!-- Overlay de Edición (Solo visible en modo edición) -->
