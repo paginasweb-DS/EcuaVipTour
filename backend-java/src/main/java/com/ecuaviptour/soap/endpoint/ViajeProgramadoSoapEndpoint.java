@@ -50,19 +50,22 @@ public class ViajeProgramadoSoapEndpoint {
     private final SocketIOService socketIOService;
     private final ReservaRepository reservaRepository;
     private final CalificacionRepository calificacionRepository;
+    private final com.ecuaviptour.service.ArchivoService archivoService;
 
     public ViajeProgramadoSoapEndpoint(ViajeProgramadoService viajeProgramadoService,
                                       ReservaService reservaService,
                                       UsuarioRepository usuarioRepository,
                                       SocketIOService socketIOService,
                                       ReservaRepository reservaRepository,
-                                      CalificacionRepository calificacionRepository) {
+                                      CalificacionRepository calificacionRepository,
+                                      com.ecuaviptour.service.ArchivoService archivoService) {
         this.viajeProgramadoService = viajeProgramadoService;
         this.reservaService = reservaService;
         this.usuarioRepository = usuarioRepository;
         this.socketIOService = socketIOService;
         this.reservaRepository = reservaRepository;
         this.calificacionRepository = calificacionRepository;
+        this.archivoService = archivoService;
     }
 
     /**
@@ -414,17 +417,14 @@ public class ViajeProgramadoSoapEndpoint {
         }
         byte[] decoded = Base64.getDecoder().decode(base64Data);
 
-        String userDir = System.getProperty("user.dir");
-        String uploadDir = Paths.get(userDir, "uploads", "comprobantes").toString();
-        File folder = new File(uploadDir);
-        if (!folder.exists()) {
-            folder.mkdirs();
+        String contentType = "image/png";
+        if (request.getFilename() != null) {
+            String lower = request.getFilename().toLowerCase();
+            if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) contentType = "image/jpeg";
+            else if (lower.endsWith(".webp")) contentType = "image/webp";
         }
 
-        String filename = "reserva_" + request.getReservaId() + "_comprobante_" + UUID.randomUUID().toString() + "_" + request.getFilename();
-        Files.write(Paths.get(uploadDir, filename), decoded);
-
-        String dbUrl = "uploads/comprobantes/" + filename;
+        String dbUrl = archivoService.subirArchivoBytes(decoded, contentType, request.getFilename(), "comprobantes");
         Reserva saved = reservaService.subirComprobante(request.getReservaId(), dbUrl);
 
         // Emit real-time notification to admin console

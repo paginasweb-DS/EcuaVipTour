@@ -87,6 +87,7 @@ public class AdminSoapEndpoint {
     private final ReservaRepository reservaRepository;
     private final GastoRepository gastoRepository;
     private final ViajeProgramadoRepository viajeProgramadoRepository;
+    private final com.ecuaviptour.service.ArchivoService archivoService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -104,6 +105,7 @@ public class AdminSoapEndpoint {
      * @param reservaRepository        Repositorio de reservas individuales.
      * @param gastoRepository          Repositorio de gastos.
      * @param viajeProgramadoRepository Repositorio de viajes programados/frecuencias.
+     * @param archivoService           Servicio para manejo de archivos en la nube (R2).
      */
     public AdminSoapEndpoint(AdminService adminService,
                              PagoService pagoService,
@@ -116,7 +118,8 @@ public class AdminSoapEndpoint {
                              SocketIOService socketIOService,
                              ReservaRepository reservaRepository,
                              GastoRepository gastoRepository,
-                             ViajeProgramadoRepository viajeProgramadoRepository) {
+                             ViajeProgramadoRepository viajeProgramadoRepository,
+                             com.ecuaviptour.service.ArchivoService archivoService) {
         this.adminService = adminService;
         this.pagoService = pagoService;
         this.viajeRepository = viajeRepository;
@@ -129,6 +132,7 @@ public class AdminSoapEndpoint {
         this.reservaRepository = reservaRepository;
         this.gastoRepository = gastoRepository;
         this.viajeProgramadoRepository = viajeProgramadoRepository;
+        this.archivoService = archivoService;
     }
 
     /**
@@ -1013,17 +1017,14 @@ public class AdminSoapEndpoint {
         }
         byte[] decoded = Base64.getDecoder().decode(base64Data);
 
-        String userDir = System.getProperty("user.dir");
-        String uploadDir = Paths.get(userDir, "uploads", "avatars").toString();
-        File folder = new File(uploadDir);
-        if (!folder.exists()) {
-            folder.mkdirs();
+        String contentType = "image/png";
+        if (request.getFilename() != null) {
+            String lower = request.getFilename().toLowerCase();
+            if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) contentType = "image/jpeg";
+            else if (lower.endsWith(".webp")) contentType = "image/webp";
         }
 
-        String filename = "user_" + user.getId() + "_avatar_" + UUID.randomUUID().toString() + "_" + request.getFilename();
-        Files.write(Paths.get(uploadDir, filename), decoded);
-
-        String avatarUrl = "uploads/avatars/" + filename;
+        String avatarUrl = archivoService.subirArchivoBytes(decoded, contentType, request.getFilename(), "avatars");
         user.setFotoPerfilUrl(avatarUrl);
         Usuario updated = usuarioRepository.save(user);
 

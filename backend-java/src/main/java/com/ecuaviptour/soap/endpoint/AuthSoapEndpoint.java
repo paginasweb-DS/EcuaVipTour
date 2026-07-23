@@ -36,6 +36,7 @@ public class AuthSoapEndpoint {
     private final AuthService authService;
     private final UsuarioRepository usuarioRepository;
     private final JwtUtil jwtUtil;
+    private final ArchivoService archivoService;
 
     /**
      * Constructor para inyectar servicios de autenticación, repositorios y utilidades JWT.
@@ -43,11 +44,13 @@ public class AuthSoapEndpoint {
      * @param authService       Servicio de lógica de autenticación.
      * @param usuarioRepository Repositorio de persistencia del usuario.
      * @param jwtUtil           Utilidad de generación y firma de tokens JWT.
+     * @param archivoService    Servicio para manejo de archivos en la nube (R2).
      */
-    public AuthSoapEndpoint(AuthService authService, UsuarioRepository usuarioRepository, JwtUtil jwtUtil) {
+    public AuthSoapEndpoint(AuthService authService, UsuarioRepository usuarioRepository, JwtUtil jwtUtil, ArchivoService archivoService) {
         this.authService = authService;
         this.usuarioRepository = usuarioRepository;
         this.jwtUtil = jwtUtil;
+        this.archivoService = archivoService;
     }
 
     /**
@@ -137,7 +140,7 @@ public class AuthSoapEndpoint {
 
     /**
      * Sube y decodifica un avatar en formato Base64 para el usuario autenticado.
-     * Guarda físicamente el archivo en el sistema de archivos del servidor.
+     * Sube el archivo resultante al almacenamiento en la nube.
      * Mapeado al request XML {@link UploadAvatarRequest}.
      *
      * @param request Payload XML que contiene el nombre del archivo y el flujo binario en Base64.
@@ -145,7 +148,7 @@ public class AuthSoapEndpoint {
      */
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "uploadAvatarRequest")
     @ResponsePayload
-    public UploadAvatarResponse uploadAvatar(@RequestPayload UploadAvatarRequest request) {
+    public UploadAvatarResponse uploadAvatar(@RequestPayload UploadAvatarRequest request) throws IOException {
         String userIdStr = SecurityContextHolder.getContext().getAuthentication().getName();
         if (userIdStr == null || userIdStr.isBlank() || "anonymousUser".equalsIgnoreCase(userIdStr)) {
             throw new UnauthorizedException("Sesión expirada o inválida. Por favor, inicia sesión de nuevo.");
@@ -158,29 +161,20 @@ public class AuthSoapEndpoint {
             throw new IllegalArgumentException("No se envio ningun archivo");
         }
 
-        // Handle base64 format metadata if present (e.g. "data:image/png;base64,...")
         if (base64Data.contains(",")) {
             base64Data = base64Data.substring(base64Data.indexOf(",") + 1);
         }
         byte[] decodedBytes = Base64.getDecoder().decode(base64Data);
 
-        String userDir = System.getProperty("user.dir");
-        String uploadDir = Paths.get(userDir, "uploads", "avatars").toString();
-        File folder = new File(uploadDir);
-        if (!folder.exists()) {
-            folder.mkdirs();
+        String contentType = "image/png";
+        if (request.getFilename() != null) {
+            String lower = request.getFilename().toLowerCase();
+            if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) contentType = "image/jpeg";
+            else if (lower.endsWith(".webp")) contentType = "image/webp";
         }
 
-        String filename = "user_" + user.getId() + "_avatar_" + UUID.randomUUID().toString() + "_" + request.getFilename();
-        File file = new File(folder, filename);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(decodedBytes);
-        } catch (IOException e) {
-            throw new RuntimeException("Error al guardar la foto de perfil en el disco.", e);
-        }
-
-        String avatarUrl = "uploads/avatars/" + filename;
-        Usuario updated = authService.updateProfile(user.getId(), null, null, avatarUrl, null, null);
+        String avatarUrl = archivoService.subirArchivoBytes(decodedBytes, contentType, request.getFilename(), "avatars");
+        Usuario updated = authService.updateProfile(user.getId(), null, null, avatarUrl, null, null, null);
 
         UploadAvatarResponse response = new UploadAvatarResponse();
         response.setMensaje("Foto de perfil actualizada correctamente");

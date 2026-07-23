@@ -36,16 +36,19 @@ public class PagosSoapEndpoint {
 
     private final PagoService pagoService;
     private final SocketIOService socketIOService;
+    private final com.ecuaviptour.service.ArchivoService archivoService;
 
     /**
      * Constructor para la inyección de dependencias de los servicios de pago y notificaciones en tiempo real.
      *
      * @param pagoService     Servicio para el registro y validación de pagos.
      * @param socketIOService Servicio para la emisión de eventos en tiempo real mediante Socket.IO.
+     * @param archivoService   Servicio para manejo de archivos en la nube (R2).
      */
-    public PagosSoapEndpoint(PagoService pagoService, SocketIOService socketIOService) {
+    public PagosSoapEndpoint(PagoService pagoService, SocketIOService socketIOService, com.ecuaviptour.service.ArchivoService archivoService) {
         this.pagoService = pagoService;
         this.socketIOService = socketIOService;
+        this.archivoService = archivoService;
     }
 
     /**
@@ -72,17 +75,14 @@ public class PagosSoapEndpoint {
         }
         byte[] decoded = Base64.getDecoder().decode(base64Data);
 
-        String userDir = System.getProperty("user.dir");
-        String uploadDir = Paths.get(userDir, "uploads", "comprobantes").toString();
-        File folder = new File(uploadDir);
-        if (!folder.exists()) {
-            folder.mkdirs();
+        String contentType = "image/png";
+        if (request.getFilename() != null) {
+            String lower = request.getFilename().toLowerCase();
+            if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) contentType = "image/jpeg";
+            else if (lower.endsWith(".webp")) contentType = "image/webp";
         }
 
-        String filename = "viaje_" + request.getViajeId() + "_comprobante_" + UUID.randomUUID().toString() + "_" + request.getFilename();
-        Files.write(Paths.get(uploadDir, filename), decoded);
-
-        String dbUrl = "uploads/comprobantes/" + filename;
+        String dbUrl = archivoService.subirArchivoBytes(decoded, contentType, request.getFilename(), "comprobantes");
         Pago saved = pagoService.registrarPago(request.getViajeId(), dbUrl, null);
 
         // Notify admins and client of new receipt upload in real-time

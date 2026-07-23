@@ -46,6 +46,7 @@ public class ChoferSoapEndpoint {
     private final ViajeService viajeService;
     private final UsuarioRepository usuarioRepository;
     private final SocketIOService socketIOService;
+    private final com.ecuaviptour.service.ArchivoService archivoService;
 
     /**
      * Constructor para la inyección de dependencias de servicios de chofer, viaje, repositorios de usuarios y sockets.
@@ -54,15 +55,18 @@ public class ChoferSoapEndpoint {
      * @param viajeService      Servicio de itinerarios y reservas.
      * @param usuarioRepository Repositorio de cuentas de usuario.
      * @param socketIOService   Servicio para notificaciones push en tiempo real.
+     * @param archivoService    Servicio para manejo de archivos en la nube (R2).
      */
     public ChoferSoapEndpoint(DriverService driverService,
                               ViajeService viajeService,
                               UsuarioRepository usuarioRepository,
-                              SocketIOService socketIOService) {
+                              SocketIOService socketIOService,
+                              com.ecuaviptour.service.ArchivoService archivoService) {
         this.driverService = driverService;
         this.viajeService = viajeService;
         this.usuarioRepository = usuarioRepository;
         this.socketIOService = socketIOService;
+        this.archivoService = archivoService;
     }
 
     /**
@@ -126,13 +130,6 @@ public class ChoferSoapEndpoint {
         Usuario driver = usuarioRepository.findById(Long.parseLong(userIdStr))
                 .orElseThrow(() -> new UnauthorizedException("Chofer no autenticado."));
 
-        String userDir = System.getProperty("user.dir");
-        String uploadDir = Paths.get(userDir, "uploads", "vehiculos").toString();
-        File folder = new File(uploadDir);
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-
         Vehiculo payload = Vehiculo.builder()
                 .placa(request.getPlaca())
                 .marca(request.getMarca())
@@ -151,9 +148,16 @@ public class ChoferSoapEndpoint {
                 base64Data = base64Data.substring(base64Data.indexOf(",") + 1);
             }
             byte[] decoded = Base64.getDecoder().decode(base64Data);
-            String filename = "chofer_" + driver.getId() + "_foto_auto_" + UUID.randomUUID().toString() + "_" + request.getFotoAutoFilename();
-            Files.write(Paths.get(uploadDir, filename), decoded);
-            payload.setFotoAutoUrl("uploads/vehiculos/" + filename);
+            
+            String contentType = "image/png";
+            if (request.getFotoAutoFilename() != null) {
+                String lower = request.getFotoAutoFilename().toLowerCase();
+                if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) contentType = "image/jpeg";
+                else if (lower.endsWith(".webp")) contentType = "image/webp";
+            }
+            
+            String fileUrl = archivoService.subirArchivoBytes(decoded, contentType, request.getFotoAutoFilename(), "vehiculos");
+            payload.setFotoAutoUrl(fileUrl);
         }
 
         if (request.getFotoMatriculaBase64() != null && !request.getFotoMatriculaBase64().isEmpty()) {
@@ -162,9 +166,16 @@ public class ChoferSoapEndpoint {
                 base64Data = base64Data.substring(base64Data.indexOf(",") + 1);
             }
             byte[] decoded = Base64.getDecoder().decode(base64Data);
-            String filename = "chofer_" + driver.getId() + "_foto_matricula_" + UUID.randomUUID().toString() + "_" + request.getFotoMatriculaFilename();
-            Files.write(Paths.get(uploadDir, filename), decoded);
-            payload.setFotoMatriculaUrl("uploads/vehiculos/" + filename);
+
+            String contentType = "image/png";
+            if (request.getFotoMatriculaFilename() != null) {
+                String lower = request.getFotoMatriculaFilename().toLowerCase();
+                if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) contentType = "image/jpeg";
+                else if (lower.endsWith(".webp")) contentType = "image/webp";
+            }
+
+            String fileUrl = archivoService.subirArchivoBytes(decoded, contentType, request.getFotoMatriculaFilename(), "vehiculos");
+            payload.setFotoMatriculaUrl(fileUrl);
         }
 
         if (request.getFotoLicenciaBase64() != null && !request.getFotoLicenciaBase64().isEmpty()) {
@@ -173,9 +184,16 @@ public class ChoferSoapEndpoint {
                 base64Data = base64Data.substring(base64Data.indexOf(",") + 1);
             }
             byte[] decoded = Base64.getDecoder().decode(base64Data);
-            String filename = "chofer_" + driver.getId() + "_foto_licencia_" + UUID.randomUUID().toString() + "_" + request.getFotoLicenciaFilename();
-            Files.write(Paths.get(uploadDir, filename), decoded);
-            payload.setFotoLicenciaUrl("uploads/vehiculos/" + filename);
+
+            String contentType = "image/png";
+            if (request.getFotoLicenciaFilename() != null) {
+                String lower = request.getFotoLicenciaFilename().toLowerCase();
+                if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) contentType = "image/jpeg";
+                else if (lower.endsWith(".webp")) contentType = "image/webp";
+            }
+
+            String fileUrl = archivoService.subirArchivoBytes(decoded, contentType, request.getFotoLicenciaFilename(), "vehiculos");
+            payload.setFotoLicenciaUrl(fileUrl);
         }
 
         Vehiculo saved = driverService.updateVehiculo(driver.getId(), payload);

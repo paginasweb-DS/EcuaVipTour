@@ -1,6 +1,9 @@
 package com.ecuaviptour.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Set;
 import java.util.UUID;
 
@@ -77,6 +80,47 @@ public class ArchivoService {
         }
 
         return quitarBarraFinal(publicUrl) + "/" + objectKey;
+    }
+
+    public String subirArchivoBytes(byte[] bytes, String contentType, String filename, String localSubDir) {
+        if (bucket != null && !bucket.isBlank()) {
+            try {
+                String extension = obtenerExtension(filename);
+                String objectKey = localSubDir + "/" + UUID.randomUUID() + extension;
+
+                PutObjectRequest request = PutObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(objectKey)
+                        .contentType(contentType != null ? contentType : "application/octet-stream")
+                        .build();
+
+                r2Client.putObject(request, RequestBody.fromBytes(bytes));
+
+                if (publicUrl != null && !publicUrl.isBlank()) {
+                    return quitarBarraFinal(publicUrl) + "/" + objectKey;
+                }
+                return objectKey;
+            } catch (Exception e) {
+                System.err.println("Error uploading to R2, falling back to local storage: " + e.getMessage());
+            }
+        }
+
+        try {
+            String userDir = System.getProperty("user.dir");
+            String uploadDir = Paths.get(userDir, "uploads", localSubDir).toString();
+            File folder = new File(uploadDir);
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+            String finalFilename = UUID.randomUUID().toString() + "_" + filename;
+            File file = new File(folder, finalFilename);
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(bytes);
+            }
+            return "uploads/" + localSubDir + "/" + finalFilename;
+        } catch (IOException e) {
+            throw new RuntimeException("Error al guardar el archivo localmente como fallback.", e);
+        }
     }
 
     private String obtenerExtension(String nombre) {
